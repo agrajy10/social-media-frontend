@@ -7,14 +7,14 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Card from "../Card";
 import FormContainer from "../FormContainer";
-import { Form, Formik } from "formik";
+import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { Link as TanstackLink } from "@tanstack/react-router";
 import { Link } from "@mui/material";
 
 const validationSchema = Yup.object({
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  password: Yup.string().required("Password is required"),
+  email: Yup.string().email("Invalid email").required("Required"),
+  password: Yup.string().required("Required"),
 });
 
 type FormValues = Yup.InferType<typeof validationSchema>;
@@ -56,7 +56,8 @@ export default function SignIn() {
               >
                 <FormControl>
                   <FormLabel htmlFor="email">Email</FormLabel>
-                  <TextField
+                  <Field
+                    as={TextField}
                     error={touched.email && Boolean(errors.email)}
                     helperText={touched.email && errors.email}
                     id="email"
@@ -74,7 +75,8 @@ export default function SignIn() {
                 </FormControl>
                 <FormControl>
                   <FormLabel htmlFor="password">Password</FormLabel>
-                  <TextField
+                  <Field
+                    as={TextField}
                     error={touched.password && Boolean(errors.password)}
                     helperText={touched.password && errors.password}
                     name="password"

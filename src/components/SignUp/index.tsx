@@ -8,14 +8,19 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Card from "../Card";
 import FormContainer from "../FormContainer";
-import { Form, Formik } from "formik";
+import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { Link as TanstackLink } from "@tanstack/react-router";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
-  password: Yup.string().required("Password is required"),
+  password: Yup.string()
+    .required("Password is required")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/,
+      "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
+    ),
   confirm_password: Yup.string()
     .required("Confirm Password is required")
     .oneOf([Yup.ref("password")], "Passwords must match"),
@@ -62,7 +67,8 @@ export default function SignUp() {
               >
                 <FormControl>
                   <FormLabel htmlFor="name">Name</FormLabel>
-                  <TextField
+                  <Field
+                    as={TextField}
                     error={touched.name && Boolean(errors.name)}
                     helperText={touched.name && errors.name}
                     id="name"
@@ -78,7 +84,8 @@ export default function SignUp() {
                 </FormControl>
                 <FormControl>
                   <FormLabel htmlFor="email">Email</FormLabel>
-                  <TextField
+                  <Field
+                    as={TextField}
                     error={touched.email && Boolean(errors.email)}
                     helperText={touched.email && errors.email}
                     id="email"
@@ -96,7 +103,8 @@ export default function SignUp() {
                 </FormControl>
                 <FormControl>
                   <FormLabel htmlFor="password">Password</FormLabel>
-                  <TextField
+                  <Field
+                    as={TextField}
                     error={touched.password && Boolean(errors.password)}
                     helperText={touched.password && errors.password}
                     name="password"
@@ -116,7 +124,8 @@ export default function SignUp() {
                   <FormLabel htmlFor="confirm_password">
                     Confirm Password
                   </FormLabel>
-                  <TextField
+                  <Field
+                    as={TextField}
                     error={
                       touched.confirm_password &&
                       Boolean(errors.confirm_password)

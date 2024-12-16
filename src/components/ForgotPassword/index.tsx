@@ -7,13 +7,13 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Card from "../Card";
 import FormContainer from "../FormContainer";
-import { Form, Formik } from "formik";
+import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { Link as TanstackLink } from "@tanstack/react-router";
 import { Link } from "@mui/material";
 
 const validationSchema = Yup.object({
-  email: Yup.string().email("Invalid email").required("Email is required"),
+  email: Yup.string().email("Invalid email").required("Required"),
 });
 
 type FormValues = Yup.InferType<typeof validationSchema>;
@@ -54,7 +54,8 @@ export default function ForgotPassword() {
               >
                 <FormControl>
                   <FormLabel htmlFor="email">Email</FormLabel>
-                  <TextField
+                  <Field
+                    as={TextField}
                     error={touched.email && Boolean(errors.email)}
                     helperText={touched.email && errors.email}
                     id="email"
