@@ -6,11 +6,16 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Card from "../Card";
 import FormContainer from "../FormContainer";
-import { Form, Formik } from "formik";
+import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 
 const validationSchema = Yup.object({
-  password: Yup.string().required("Required"),
+  password: Yup.string()
+    .required("Required")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/,
+      "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
+    ),
   confirm_password: Yup.string()
     .required("Required")
     .oneOf([Yup.ref("password")], "Passwords must match"),
@@ -43,7 +48,7 @@ export default function ResetPassword() {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ touched, errors }) => (
+          {({ touched, errors, values }) => (
             <Form>
               <Box
                 sx={{
@@ -55,7 +60,8 @@ export default function ResetPassword() {
               >
                 <FormControl>
                   <FormLabel htmlFor="password">Password</FormLabel>
-                  <TextField
+                  <Field
+                    as={TextField}
                     error={touched.password && Boolean(errors.password)}
                     helperText={touched.password && errors.password}
                     name="password"
@@ -75,7 +81,9 @@ export default function ResetPassword() {
                   <FormLabel htmlFor="confirm_password">
                     Confirm password
                   </FormLabel>
-                  <TextField
+                  <Field
+                    as={TextField}
+                    value={values.confirm_password}
                     error={
                       touched.confirm_password &&
                       Boolean(errors.confirm_password)
