@@ -61,7 +61,7 @@ export default function SignUp() {
               variant: "error",
             });
           default:
-            enqueueSnackbar("Something went wrong. Please try again", {
+            return enqueueSnackbar("Something went wrong. Please try again", {
               variant: "error",
             });
         }

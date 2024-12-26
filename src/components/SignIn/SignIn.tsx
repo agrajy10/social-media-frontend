@@ -11,22 +11,48 @@ import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { Link as TanstackLink } from "@tanstack/react-router";
 import { Link } from "@mui/material";
+import { useSnackbar } from "notistack";
+import axiosInstance from "../../axios";
+import { AxiosError } from "axios";
 
 const validationSchema = Yup.object({
-  email: Yup.string().email("Invalid email").required("Required"),
+  username: Yup.string().required("Required"),
   password: Yup.string().required("Required"),
 });
 
 type FormValues = Yup.InferType<typeof validationSchema>;
 
 const initialValues: FormValues = {
-  email: "",
+  username: "",
   password: "",
 };
 
 export default function SignIn() {
-  const handleSubmit = (values: FormValues) => {
-    console.log(values);
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleSubmit = async (values: FormValues) => {
+    try {
+      await axiosInstance.post("/user/login", values, {
+        withCredentials: true,
+      });
+      enqueueSnackbar("Signed in successfully", { variant: "success" });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        switch (error.status) {
+          case 401:
+            return enqueueSnackbar(error.response?.data.message, {
+              variant: "error",
+            });
+          default:
+            return enqueueSnackbar("Something went wrong. Please try again", {
+              variant: "error",
+            });
+        }
+      }
+      enqueueSnackbar("Something went wrong. Please try again", {
+        variant: "error",
+      });
+    }
   };
 
   return (
@@ -44,7 +70,7 @@ export default function SignIn() {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ touched, errors }) => (
+          {({ touched, errors, isSubmitting }) => (
             <Form>
               <Box
                 sx={{
@@ -55,19 +81,19 @@ export default function SignIn() {
                 }}
               >
                 <FormControl>
-                  <FormLabel htmlFor="email">Email</FormLabel>
+                  <FormLabel htmlFor="username">Email or username</FormLabel>
                   <Field
                     as={TextField}
-                    error={touched.email && Boolean(errors.email)}
-                    helperText={touched.email && errors.email}
-                    id="email"
-                    type="email"
-                    name="email"
-                    placeholder="your@email.com"
+                    error={touched.username && Boolean(errors.username)}
+                    helperText={touched.username && errors.username}
+                    id="username"
+                    type="username"
+                    name="username"
+                    placeholder="johndoe@username.com or johndoe196"
                     fullWidth
                     variant="outlined"
                     color={
-                      touched.email && Boolean(errors.email)
+                      touched.username && Boolean(errors.username)
                         ? "error"
                         : "primary"
                     }
@@ -92,7 +118,12 @@ export default function SignIn() {
                     }
                   />
                 </FormControl>
-                <Button type="submit" fullWidth variant="contained">
+                <Button
+                  disabled={isSubmitting}
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                >
                   Sign in
                 </Button>
                 <Link
