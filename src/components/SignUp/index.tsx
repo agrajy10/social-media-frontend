@@ -8,12 +8,15 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Card from "../Card";
 import FormContainer from "../FormContainer";
-import { Field, Form, Formik } from "formik";
+import { Field, Form, Formik, FormikHelpers } from "formik";
 import * as Yup from "yup";
-import { Link as TanstackLink } from "@tanstack/react-router";
+import { Link as TanstackLink, useNavigate } from "@tanstack/react-router";
+import axiosInstance from "../../axios";
+import { useSnackbar } from "notistack";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
+  username: Yup.string().min(6, "Too Short!").required("Username is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   password: Yup.string()
     .required("Password is required")
@@ -29,6 +32,7 @@ const validationSchema = Yup.object({
 type FormValues = Yup.InferType<typeof validationSchema>;
 
 const initialValues: FormValues = {
+  username: "",
   name: "",
   email: "",
   password: "",
@@ -36,8 +40,23 @@ const initialValues: FormValues = {
 };
 
 export default function SignUp() {
-  const handleSubmit = (values: FormValues) => {
-    console.log(values);
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleSubmit = async (
+    values: FormValues,
+    { resetForm }: FormikHelpers<FormValues>
+  ) => {
+    try {
+      await axiosInstance.post("/user/register", values);
+      resetForm();
+      navigate({ to: "/" });
+      enqueueSnackbar("Account created successfully", { variant: "success" });
+    } catch (error) {
+      enqueueSnackbar("Something went wrong. Please try again", {
+        variant: "error",
+      });
+    }
   };
 
   return (
@@ -75,6 +94,23 @@ export default function SignUp() {
                     type="text"
                     name="name"
                     placeholder="John Doe"
+                    fullWidth
+                    variant="outlined"
+                    color={
+                      touched.name && Boolean(errors.name) ? "error" : "primary"
+                    }
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel htmlFor="username">Username</FormLabel>
+                  <Field
+                    as={TextField}
+                    error={touched.username && Boolean(errors.username)}
+                    helperText={touched.username && errors.username}
+                    id="username"
+                    type="text"
+                    name="username"
+                    placeholder="johndoe196"
                     fullWidth
                     variant="outlined"
                     color={

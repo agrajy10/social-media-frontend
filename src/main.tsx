@@ -8,6 +8,7 @@ import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import "@fontsource/inter/900.css";
 import { routeTree } from "./routeTree.gen";
+import { SnackbarProvider } from "notistack";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -25,7 +26,12 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <StyledEngineProvider>
-        <RouterProvider router={router} />
+        <SnackbarProvider
+          autoHideDuration={5000}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <RouterProvider router={router} />
+        </SnackbarProvider>
       </StyledEngineProvider>
     </StrictMode>
   );
