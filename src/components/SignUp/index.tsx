@@ -13,6 +13,7 @@ import * as Yup from "yup";
 import { Link as TanstackLink, useNavigate } from "@tanstack/react-router";
 import axiosInstance from "../../axios";
 import { useSnackbar } from "notistack";
+import { AxiosError } from "axios";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
@@ -53,6 +54,18 @@ export default function SignUp() {
       navigate({ to: "/" });
       enqueueSnackbar("Account created successfully", { variant: "success" });
     } catch (error) {
+      if (error instanceof AxiosError) {
+        switch (error.status) {
+          case 400:
+            return enqueueSnackbar(error.response?.data.errors[0].message, {
+              variant: "error",
+            });
+          default:
+            enqueueSnackbar("Something went wrong. Please try again", {
+              variant: "error",
+            });
+        }
+      }
       enqueueSnackbar("Something went wrong. Please try again", {
         variant: "error",
       });
