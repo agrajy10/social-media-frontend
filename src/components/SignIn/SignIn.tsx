@@ -32,9 +32,8 @@ export default function SignIn() {
 
   const handleSubmit = async (values: FormValues) => {
     try {
-      await axiosInstance.post("/user/login", values, {
-        withCredentials: true,
-      });
+      const { data } = await axiosInstance.post("/user/login", values);
+      window.localStorage.setItem("token", data.data.token);
       enqueueSnackbar("Signed in successfully", { variant: "success" });
     } catch (error) {
       if (error instanceof AxiosError) {
