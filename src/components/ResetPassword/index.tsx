@@ -8,6 +8,10 @@ import Card from "../Card";
 import FormContainer from "../FormContainer";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import { useSnackbar } from "notistack";
+import axiosInstance from "../../axios";
+import { AxiosError } from "axios";
 
 const validationSchema = Yup.object({
   password: Yup.string()
@@ -29,8 +33,40 @@ const initialValues: FormValues = {
 };
 
 export default function ResetPassword() {
-  const handleSubmit = (values: FormValues) => {
-    console.log(values);
+  const { search } = useLocation();
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleSubmit = async (values: FormValues) => {
+    if (!("token" in search)) {
+      return;
+    }
+    try {
+      await axiosInstance.post("/user/reset-password", {
+        password: values.password,
+        token: search.token,
+      });
+      enqueueSnackbar("Password has been reset successfully", {
+        variant: "success",
+      });
+      navigate({ to: "/" });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        switch (error.status) {
+          case 400:
+            return enqueueSnackbar(error.response?.data.message, {
+              variant: "error",
+            });
+          default:
+            return enqueueSnackbar("Something went wrong. Please try again", {
+              variant: "error",
+            });
+        }
+      }
+      enqueueSnackbar("Something went wrong. Please try again", {
+        variant: "error",
+      });
+    }
   };
 
   return (

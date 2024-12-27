@@ -7,10 +7,13 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Card from "../Card";
 import FormContainer from "../FormContainer";
-import { Field, Form, Formik } from "formik";
+import { Field, Form, Formik, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { Link as TanstackLink } from "@tanstack/react-router";
 import { Link } from "@mui/material";
+import { useSnackbar } from "notistack";
+import axiosInstance from "../../axios";
+import { AxiosError } from "axios";
 
 const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -23,8 +26,35 @@ const initialValues: FormValues = {
 };
 
 export default function ForgotPassword() {
-  const handleSubmit = (values: FormValues) => {
-    console.log(values);
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleSubmit = async (
+    values: FormValues,
+    { resetForm }: FormikHelpers<FormValues>
+  ) => {
+    try {
+      await axiosInstance.post("/user/forgot-password", values);
+      enqueueSnackbar("Link to reset password has been sent to your email", {
+        variant: "success",
+      });
+      resetForm();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        switch (error.status) {
+          case 400:
+            return enqueueSnackbar(error.response?.data.errors[0].message, {
+              variant: "error",
+            });
+          default:
+            return enqueueSnackbar("Something went wrong. Please try again", {
+              variant: "error",
+            });
+        }
+      }
+      enqueueSnackbar("Something went wrong. Please try again", {
+        variant: "error",
+      });
+    }
   };
 
   return (
@@ -42,7 +72,7 @@ export default function ForgotPassword() {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ touched, errors }) => (
+          {({ touched, errors, isSubmitting }) => (
             <Form>
               <Box
                 sx={{
@@ -71,7 +101,12 @@ export default function ForgotPassword() {
                     }
                   />
                 </FormControl>
-                <Button type="submit" fullWidth variant="contained">
+                <Button
+                  disabled={isSubmitting}
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                >
                   Send reset password link
                 </Button>
               </Box>
