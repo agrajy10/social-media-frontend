@@ -42,7 +42,7 @@ export default function ResetPassword() {
       return;
     }
     try {
-      await axiosInstance.post("/user/reset-password", {
+      await axiosInstance.post("/users/reset-password", {
         password: values.password,
         token: search.token,
       });

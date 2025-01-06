@@ -49,7 +49,7 @@ export default function SignUp() {
     { resetForm }: FormikHelpers<FormValues>
   ) => {
     try {
-      await axiosInstance.post("/user/register", values);
+      await axiosInstance.post("/users/register", values);
       resetForm();
       navigate({ to: "/" });
       enqueueSnackbar("Account created successfully", { variant: "success" });

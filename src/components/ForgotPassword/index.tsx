@@ -33,7 +33,7 @@ export default function ForgotPassword() {
     { resetForm }: FormikHelpers<FormValues>
   ) => {
     try {
-      await axiosInstance.post("/user/forgot-password", values);
+      await axiosInstance.post("/users/forgot-password", values);
       enqueueSnackbar("Link to reset password has been sent to your email", {
         variant: "success",
       });
