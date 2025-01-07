@@ -56,7 +56,12 @@ function TopBar() {
         {user && (
           <>
             <ButtonBase onClick={openMenu}>
-              <Avatar>{user.name.charAt(0).toUpperCase()}</Avatar>
+              {user.profileImage && (
+                <Avatar alt={user.name} src={user.profileImage} />
+              )}
+              {!user.profileImage && (
+                <Avatar>{user.name.charAt(0).toUpperCase()}</Avatar>
+              )}
             </ButtonBase>
             <Menu
               id="basic-menu"
