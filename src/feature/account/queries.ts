@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosInstance from "../../axios";
 import { User } from "../../types/User";
 import convertToBase64 from "../../utils/convertToBase64";
+import { ChangePasswordFormValues } from "../../components/ManageProfile";
 
 const fetchAccountDetails = async (): Promise<User> => {
   const response = await axiosInstance.get("/users/profile");
@@ -16,6 +17,13 @@ const updateProfileImage = async (profile_image: File): Promise<User> => {
   return response.data.data;
 };
 
+const updatePassword = async (
+  values: ChangePasswordFormValues
+): Promise<User> => {
+  const response = await axiosInstance.put("/users/change-password", values);
+  return response.data.data;
+};
+
 export const useFetchAccountDetails = () =>
   useQuery({
     queryKey: ["user", "accountDetails"],
@@ -26,4 +34,9 @@ export const useFetchAccountDetails = () =>
 export const useUpdateProfileImage = () =>
   useMutation({
     mutationFn: updateProfileImage,
+  });
+
+export const useUpdatePassword = () =>
+  useMutation({
+    mutationFn: updatePassword,
   });
