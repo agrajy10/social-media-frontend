@@ -23,8 +23,6 @@ function TopBar() {
     setAnchorEl(null);
   };
 
-  console.log(user);
-
   return (
     <Paper
       sx={{

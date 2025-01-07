@@ -9,11 +9,12 @@ import Card from "../Card";
 import FormContainer from "../FormContainer";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
-import { Link as TanstackLink } from "@tanstack/react-router";
+import { Link as TanstackLink, useNavigate } from "@tanstack/react-router";
 import { Link } from "@mui/material";
 import { useSnackbar } from "notistack";
 import axiosInstance from "../../axios";
 import { AxiosError } from "axios";
+import useAuth from "../../hooks/useAuth";
 
 const validationSchema = Yup.object({
   username: Yup.string().required("Required"),
@@ -29,12 +30,16 @@ const initialValues: FormValues = {
 
 export default function SignIn() {
   const { enqueueSnackbar } = useSnackbar();
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (values: FormValues) => {
     try {
       const { data } = await axiosInstance.post("/users/login", values);
       window.localStorage.setItem("token", data.data.token);
+      setUser(data.data);
       enqueueSnackbar("Signed in successfully", { variant: "success" });
+      navigate({ to: "/my-profile" });
     } catch (error) {
       if (error instanceof AxiosError) {
         switch (error.status) {
