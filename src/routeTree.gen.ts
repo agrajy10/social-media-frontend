@@ -14,15 +14,14 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as ResetPasswordImport } from './routes/reset-password'
+import { Route as authImport } from './routes/__auth'
 import { Route as IndexImport } from './routes/index'
+import { Route as authMyProfileIndexImport } from './routes/__auth.my-profile/index'
 
 // Create Virtual Routes
 
 const RegisterLazyImport = createFileRoute('/register')()
 const ForgotPasswordLazyImport = createFileRoute('/forgot-password')()
-const MyProfileChangePasswordLazyImport = createFileRoute(
-  '/my-profile/change-password',
-)()
 
 // Create/Update Routes
 
@@ -46,20 +45,22 @@ const ResetPasswordRoute = ResetPasswordImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const authRoute = authImport.update({
+  id: '/__auth',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
 
-const MyProfileChangePasswordLazyRoute =
-  MyProfileChangePasswordLazyImport.update({
-    id: '/my-profile/change-password',
-    path: '/my-profile/change-password',
-    getParentRoute: () => rootRoute,
-  } as any).lazy(() =>
-    import('./routes/my-profile/change-password.lazy').then((d) => d.Route),
-  )
+const authMyProfileIndexRoute = authMyProfileIndexImport.update({
+  id: '/my-profile/',
+  path: '/my-profile/',
+  getParentRoute: () => authRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -70,6 +71,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/__auth': {
+      id: '/__auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof authImport
       parentRoute: typeof rootRoute
     }
     '/reset-password': {
@@ -93,82 +101,98 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterLazyImport
       parentRoute: typeof rootRoute
     }
-    '/my-profile/change-password': {
-      id: '/my-profile/change-password'
-      path: '/my-profile/change-password'
-      fullPath: '/my-profile/change-password'
-      preLoaderRoute: typeof MyProfileChangePasswordLazyImport
-      parentRoute: typeof rootRoute
+    '/__auth/my-profile/': {
+      id: '/__auth/my-profile/'
+      path: '/my-profile'
+      fullPath: '/my-profile'
+      preLoaderRoute: typeof authMyProfileIndexImport
+      parentRoute: typeof authImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface authRouteChildren {
+  authMyProfileIndexRoute: typeof authMyProfileIndexRoute
+}
+
+const authRouteChildren: authRouteChildren = {
+  authMyProfileIndexRoute: authMyProfileIndexRoute,
+}
+
+const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '': typeof authRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
   '/register': typeof RegisterLazyRoute
-  '/my-profile/change-password': typeof MyProfileChangePasswordLazyRoute
+  '/my-profile': typeof authMyProfileIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '': typeof authRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
   '/register': typeof RegisterLazyRoute
-  '/my-profile/change-password': typeof MyProfileChangePasswordLazyRoute
+  '/my-profile': typeof authMyProfileIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/__auth': typeof authRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
   '/register': typeof RegisterLazyRoute
-  '/my-profile/change-password': typeof MyProfileChangePasswordLazyRoute
+  '/__auth/my-profile/': typeof authMyProfileIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | ''
     | '/reset-password'
     | '/forgot-password'
     | '/register'
-    | '/my-profile/change-password'
+    | '/my-profile'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | ''
     | '/reset-password'
     | '/forgot-password'
     | '/register'
-    | '/my-profile/change-password'
+    | '/my-profile'
   id:
     | '__root__'
     | '/'
+    | '/__auth'
     | '/reset-password'
     | '/forgot-password'
     | '/register'
-    | '/my-profile/change-password'
+    | '/__auth/my-profile/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  authRoute: typeof authRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   ForgotPasswordLazyRoute: typeof ForgotPasswordLazyRoute
   RegisterLazyRoute: typeof RegisterLazyRoute
-  MyProfileChangePasswordLazyRoute: typeof MyProfileChangePasswordLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  authRoute: authRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   ForgotPasswordLazyRoute: ForgotPasswordLazyRoute,
   RegisterLazyRoute: RegisterLazyRoute,
-  MyProfileChangePasswordLazyRoute: MyProfileChangePasswordLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -182,14 +206,20 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/__auth",
         "/reset-password",
         "/forgot-password",
-        "/register",
-        "/my-profile/change-password"
+        "/register"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/__auth": {
+      "filePath": "__auth.tsx",
+      "children": [
+        "/__auth/my-profile/"
+      ]
     },
     "/reset-password": {
       "filePath": "reset-password.tsx"
@@ -200,8 +230,9 @@ export const routeTree = rootRoute
     "/register": {
       "filePath": "register.lazy.tsx"
     },
-    "/my-profile/change-password": {
-      "filePath": "my-profile/change-password.lazy.tsx"
+    "/__auth/my-profile/": {
+      "filePath": "__auth.my-profile/index.tsx",
+      "parent": "/__auth"
     }
   }
 }
