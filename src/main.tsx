@@ -8,13 +8,8 @@ import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import "@fontsource/inter/900.css";
 import { routeTree } from "./routeTree.gen";
-import { enqueueSnackbar, SnackbarProvider } from "notistack";
-import {
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
-import axios from "axios";
+import { SnackbarProvider } from "notistack";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -33,19 +28,6 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
     },
   },
-  queryCache: new QueryCache({
-    onError: (error) => {
-      if (axios.isAxiosError(error)) {
-        return enqueueSnackbar(error.response?.data.message, {
-          variant: "error",
-        });
-      }
-      return enqueueSnackbar(
-        "Ha ocurrido un error inesperado. Por favor, inténtalo nuevamente",
-        { variant: "error" }
-      );
-    },
-  }),
 });
 
 const rootElement = document.getElementById("root")!;
