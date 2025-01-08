@@ -7,10 +7,11 @@ import {
   MenuItem,
   Paper,
   Typography,
+  Link,
 } from "@mui/material";
 import { MouseEvent, useState } from "react";
 import useAuth from "../../hooks/useAuth";
-import { Link } from "@tanstack/react-router";
+import { Link as TanstackLink } from "@tanstack/react-router";
 
 function TopBar() {
   const { user, logout } = useAuth();
@@ -36,8 +37,8 @@ function TopBar() {
         maxWidth="xl"
         sx={{
           display: "flex",
-          justifyContent: "space-between",
           alignItems: "center",
+          gap: 4,
         }}
       >
         <Typography fontWeight={700} fontSize={20}>
@@ -53,9 +54,12 @@ function TopBar() {
             media
           </Typography>
         </Typography>
+        <Link component={TanstackLink} to="/feed">
+          Feed
+        </Link>
         {user && (
           <>
-            <ButtonBase onClick={openMenu}>
+            <ButtonBase sx={{ ml: "auto" }} onClick={openMenu}>
               {user.profileImage && (
                 <Avatar alt={user.name} src={user.profileImage} />
               )}
@@ -100,7 +104,7 @@ function TopBar() {
                 }}
                 onClick={closeMenu}
               >
-                <Link to="/my-profile">
+                <Link component={TanstackLink} to="/my-profile">
                   <Typography>Profile</Typography>
                 </Link>
               </MenuItem>

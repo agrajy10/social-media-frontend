@@ -22,6 +22,7 @@ import { Route as authMyProfileIndexImport } from './routes/__auth.my-profile/in
 
 const RegisterLazyImport = createFileRoute('/register')()
 const ForgotPasswordLazyImport = createFileRoute('/forgot-password')()
+const authFeedIndexLazyImport = createFileRoute('/__auth/feed/')()
 
 // Create/Update Routes
 
@@ -55,6 +56,14 @@ const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
+
+const authFeedIndexLazyRoute = authFeedIndexLazyImport
+  .update({
+    id: '/feed/',
+    path: '/feed/',
+    getParentRoute: () => authRoute,
+  } as any)
+  .lazy(() => import('./routes/__auth.feed/index.lazy').then((d) => d.Route))
 
 const authMyProfileIndexRoute = authMyProfileIndexImport.update({
   id: '/my-profile/',
@@ -108,6 +117,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authMyProfileIndexImport
       parentRoute: typeof authImport
     }
+    '/__auth/feed/': {
+      id: '/__auth/feed/'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof authFeedIndexLazyImport
+      parentRoute: typeof authImport
+    }
   }
 }
 
@@ -115,10 +131,12 @@ declare module '@tanstack/react-router' {
 
 interface authRouteChildren {
   authMyProfileIndexRoute: typeof authMyProfileIndexRoute
+  authFeedIndexLazyRoute: typeof authFeedIndexLazyRoute
 }
 
 const authRouteChildren: authRouteChildren = {
   authMyProfileIndexRoute: authMyProfileIndexRoute,
+  authFeedIndexLazyRoute: authFeedIndexLazyRoute,
 }
 
 const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
@@ -130,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordLazyRoute
   '/register': typeof RegisterLazyRoute
   '/my-profile': typeof authMyProfileIndexRoute
+  '/feed': typeof authFeedIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
@@ -139,6 +158,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordLazyRoute
   '/register': typeof RegisterLazyRoute
   '/my-profile': typeof authMyProfileIndexRoute
+  '/feed': typeof authFeedIndexLazyRoute
 }
 
 export interface FileRoutesById {
@@ -149,6 +169,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordLazyRoute
   '/register': typeof RegisterLazyRoute
   '/__auth/my-profile/': typeof authMyProfileIndexRoute
+  '/__auth/feed/': typeof authFeedIndexLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -160,6 +181,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/register'
     | '/my-profile'
+    | '/feed'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -168,6 +190,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/register'
     | '/my-profile'
+    | '/feed'
   id:
     | '__root__'
     | '/'
@@ -176,6 +199,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/register'
     | '/__auth/my-profile/'
+    | '/__auth/feed/'
   fileRoutesById: FileRoutesById
 }
 
@@ -218,7 +242,8 @@ export const routeTree = rootRoute
     "/__auth": {
       "filePath": "__auth.tsx",
       "children": [
-        "/__auth/my-profile/"
+        "/__auth/my-profile/",
+        "/__auth/feed/"
       ]
     },
     "/reset-password": {
@@ -232,6 +257,10 @@ export const routeTree = rootRoute
     },
     "/__auth/my-profile/": {
       "filePath": "__auth.my-profile/index.tsx",
+      "parent": "/__auth"
+    },
+    "/__auth/feed/": {
+      "filePath": "__auth.feed/index.lazy.tsx",
       "parent": "/__auth"
     }
   }
