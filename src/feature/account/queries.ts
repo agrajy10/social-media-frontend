@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosInstance from "../../axios";
 import { User } from "../../types/User";
 import convertToBase64 from "../../utils/convertToBase64";
-import { ChangePasswordFormValues } from "../../components/ManageProfile";
+import { ChangePasswordFormValues } from "../../components/ManageProfile/ChangePassword";
 
 const fetchAccountDetails = async (): Promise<User> => {
   const response = await axiosInstance.get("/users/profile");

@@ -10,7 +10,8 @@ import {
 import { createFileRoute } from "@tanstack/react-router";
 import useAuth from "../../hooks/useAuth";
 import { SyntheticEvent, useState } from "react";
-import ManageProfile from "../../components/ManageProfile";
+import ChangePassword from "../../components/ManageProfile/ChangePassword";
+import UploadProfileImage from "../../components/ManageProfile/UploadProfileImage";
 
 export const Route = createFileRoute("/__auth/my-profile/")({
   component: MyProfile,
@@ -35,7 +36,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 2 }}>
+        <Box sx={{ py: 4, px: 2 }}>
           <Typography>{children}</Typography>
         </Box>
       )}
@@ -60,7 +61,7 @@ function MyProfile() {
 
   return (
     <>
-      <Container maxWidth="lg" sx={{ my: 5 }}>
+      <Container maxWidth="md" sx={{ my: 5 }}>
         {user && (
           <>
             <Box
@@ -114,14 +115,22 @@ function MyProfile() {
                 <Tab
                   sx={{ p: 2, m: 0, borderRadius: 0 }}
                   {...a11yProps(1)}
-                  label="Manage Profile"
+                  label="Upload profile picture"
+                />
+                <Tab
+                  sx={{ p: 2, m: 0, borderRadius: 0 }}
+                  {...a11yProps(2)}
+                  label="Change password"
                 />
               </Tabs>
               <TabPanel value={activeTab} index={0}>
                 Posts
               </TabPanel>
               <TabPanel value={activeTab} index={1}>
-                <ManageProfile />
+                <UploadProfileImage />
+              </TabPanel>
+              <TabPanel value={activeTab} index={2}>
+                <ChangePassword />
               </TabPanel>
             </Paper>
           </>
