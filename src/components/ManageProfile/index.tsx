@@ -39,8 +39,10 @@ const initialValues: ChangePasswordFormValues = {
 };
 
 function ManageProfile() {
-  const { mutate: updateProfileImage } = useUpdateProfileImage();
-  const { mutate: updatePassword } = useUpdatePassword();
+  const { mutate: updateProfileImage, isPending: isUploadingProfileImage } =
+    useUpdateProfileImage();
+  const { mutate: updatePassword, isPending: isUpdatingPassword } =
+    useUpdatePassword();
   const { enqueueSnackbar } = useSnackbar();
   const { setUser } = useAuth();
 
@@ -93,7 +95,7 @@ function ManageProfile() {
           validateOnBlur={false}
           validateOnChange={false}
         >
-          {({ values, setFieldError, setFieldValue, isSubmitting, errors }) => (
+          {({ values, setFieldError, setFieldValue, errors }) => (
             <Form>
               <Dropzone
                 onDropAccepted={(files) => {
@@ -139,7 +141,7 @@ function ManageProfile() {
                 variant="contained"
                 color="primary"
                 type="submit"
-                disabled={isSubmitting || !values.profile_image}
+                disabled={isUploadingProfileImage || !values.profile_image}
                 sx={{ mt: 2 }}
               >
                 Upload
@@ -157,7 +159,7 @@ function ManageProfile() {
           validationSchema={passwordFormValidationSchema}
           onSubmit={handleProfilePasswordChange}
         >
-          {({ values, errors, touched, isSubmitting }) => (
+          {({ values, errors, touched }) => (
             <Form>
               <Box
                 sx={{
@@ -215,7 +217,7 @@ function ManageProfile() {
                   />
                 </FormControl>
                 <Button
-                  disabled={isSubmitting}
+                  disabled={isUpdatingPassword}
                   type="submit"
                   fullWidth
                   variant="contained"

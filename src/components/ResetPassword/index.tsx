@@ -84,7 +84,7 @@ export default function ResetPassword() {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ touched, errors, values }) => (
+          {({ touched, errors, values, isSubmitting }) => (
             <Form>
               <Box
                 sx={{
@@ -141,7 +141,12 @@ export default function ResetPassword() {
                     }
                   />
                 </FormControl>
-                <Button type="submit" fullWidth variant="contained">
+                <Button
+                  disabled={isSubmitting}
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                >
                   Submit
                 </Button>
               </Box>

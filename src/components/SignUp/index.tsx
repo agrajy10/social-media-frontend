@@ -87,7 +87,7 @@ export default function SignUp() {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ touched, errors }) => (
+          {({ touched, errors, isSubmitting }) => (
             <Form>
               <Box
                 sx={{
@@ -196,7 +196,12 @@ export default function SignUp() {
                     }
                   />
                 </FormControl>
-                <Button type="submit" fullWidth variant="contained">
+                <Button
+                  disabled={isSubmitting}
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                >
                   Sign in
                 </Button>
               </Box>
