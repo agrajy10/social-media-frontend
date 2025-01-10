@@ -9,13 +9,20 @@ export type CreatePostFormValues = {
 };
 
 type AddPostProps = {
+  postTitle?: string;
+  postContent?: string;
   onSubmit: (title: string, content: string) => void;
   isSubmitting: boolean;
 };
 
-function AddPost({ onSubmit, isSubmitting }: AddPostProps) {
+function AddPost({
+  onSubmit,
+  isSubmitting,
+  postTitle = "",
+  postContent = "",
+}: AddPostProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [title, setTitle] = useState<string>("");
+  const [title, setTitle] = useState<string>(postTitle);
   const editorRef = useRef<TinyMCEEditor | null>(null);
 
   const handleValidation = () => {
@@ -65,7 +72,7 @@ function AddPost({ onSubmit, isSubmitting }: AddPostProps) {
       <Editor
         apiKey={import.meta.env.VITE_TINY_MCE_API_KEY}
         onInit={(_evt, editor) => (editorRef.current = editor)}
-        initialValue=""
+        initialValue={postContent}
         init={{
           placeholder: "What's on your mind today?",
           height: 250,
