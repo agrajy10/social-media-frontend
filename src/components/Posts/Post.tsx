@@ -2,6 +2,7 @@ import { Avatar, Box, Paper, Typography } from "@mui/material";
 import { Post as PostType } from "../../types/Post";
 import parse from "html-react-parser";
 import { formatDistanceToNow, differenceInMilliseconds } from "date-fns";
+import PostUserMenu from "../PostUserMenu";
 
 const UserAvatar = ({
   profileImage,
@@ -27,12 +28,27 @@ const UserAvatar = ({
   );
 };
 
-function Post({ title, content, createdAt, updatedAt, author }: PostType) {
+function Post({
+  title,
+  content,
+  createdAt,
+  updatedAt,
+  author,
+  isAuthor = false,
+}: PostType & { isAuthor?: boolean }) {
   const wasPostUpdated =
     differenceInMilliseconds(new Date(updatedAt), new Date(createdAt)) > 0;
 
   return (
-    <Paper elevation={1} sx={{ p: 2, bgcolor: "common.white" }}>
+    <Paper
+      elevation={1}
+      sx={{ p: 2, bgcolor: "common.white", position: "relative" }}
+    >
+      {isAuthor && (
+        <Box sx={{ position: "absolute", top: 10, right: 10 }}>
+          <PostUserMenu />
+        </Box>
+      )}
       <Typography variant="h4" fontWeight={700}>
         {title}
       </Typography>
