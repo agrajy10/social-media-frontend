@@ -13,6 +13,20 @@ const createPost = async (values: CreatePostFormValues): Promise<Post> => {
   return response.data.data;
 };
 
+const editPost = async ({
+  postId,
+  values,
+}: {
+  postId: number;
+  values: CreatePostFormValues;
+}): Promise<Post> => {
+  const response = await axiosInstance.put(
+    `/posts/update-post/${postId}`,
+    values
+  );
+  return response.data.data;
+};
+
 const deletePost = async (postId: number): Promise<void> => {
   await axiosInstance.delete(`/posts/delete-post/${postId}`);
 };
@@ -20,6 +34,11 @@ const deletePost = async (postId: number): Promise<void> => {
 export const useCreatePost = () =>
   useMutation({
     mutationFn: createPost,
+  });
+
+export const useEditPost = () =>
+  useMutation({
+    mutationFn: editPost,
   });
 
 export const useDeletePost = () =>

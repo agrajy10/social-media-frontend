@@ -4,9 +4,10 @@ import { MouseEvent, useState } from "react";
 
 interface PostUserMenuProps {
   onDeleteBtnClick?: () => void;
+  onEditBtnClick?: () => void;
 }
 
-function PostUserMenu({ onDeleteBtnClick }: PostUserMenuProps) {
+function PostUserMenu({ onEditBtnClick, onDeleteBtnClick }: PostUserMenuProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const openMenu = (event: MouseEvent<HTMLButtonElement>) => {
@@ -35,7 +36,10 @@ function PostUserMenu({ onDeleteBtnClick }: PostUserMenuProps) {
           horizontal: "right",
         }}
       >
-        <MenuItem sx={{ fontSize: 12 }} onClick={handleClose}>
+        <MenuItem sx={{ fontSize: 12 }} onClick={() => {
+          onEditBtnClick?.();
+          handleClose();
+        }}>
           Edit Post
         </MenuItem>
         <MenuItem

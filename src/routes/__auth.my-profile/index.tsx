@@ -144,7 +144,13 @@ function MyProfile() {
                     ))}
                   </Stack>
                 )}
-                {posts && <Posts refetch={refetch} posts={posts} />}
+                {posts && (
+                  <Posts
+                    queryKey={["user", "myPosts"]}
+                    posts={posts}
+                    refetch={refetch}
+                  />
+                )}
               </TabPanel>
               <TabPanel value={activeTab} index={1}>
                 <UploadProfileImage />

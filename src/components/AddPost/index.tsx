@@ -9,6 +9,7 @@ export type CreatePostFormValues = {
 };
 
 type AddPostProps = {
+  isEditing?: boolean;
   postTitle?: string;
   postContent?: string;
   onSubmit: (title: string, content: string) => void;
@@ -16,6 +17,7 @@ type AddPostProps = {
 };
 
 function AddPost({
+  isEditing = false,
   onSubmit,
   isSubmitting,
   postTitle = "",
@@ -52,7 +54,7 @@ function AddPost({
 
   return (
     <Paper
-      elevation={1}
+      elevation={!isEditing ? 1 : 0}
       sx={{ p: 2, bgcolor: "common.white", border: "1px solid #efefef" }}
     >
       <TextField
@@ -98,7 +100,7 @@ function AddPost({
           variant="contained"
           color="primary"
         >
-          Post
+          {isEditing ? "Update" : "Post"}
         </Button>
       </Box>
     </Paper>

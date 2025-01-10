@@ -38,7 +38,9 @@ function RouteComponent() {
             ))}
           </Stack>
         )}
-        {posts && <Posts posts={posts} refetch={refetch} />}
+        {posts && (
+          <Posts queryKey={["posts"]} posts={posts} refetch={refetch} />
+        )}
       </Box>
     </Container>
   );
