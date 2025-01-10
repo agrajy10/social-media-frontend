@@ -13,9 +13,18 @@ const createPost = async (values: CreatePostFormValues): Promise<Post> => {
   return response.data.data;
 };
 
+const deletePost = async (postId: number): Promise<void> => {
+  await axiosInstance.delete(`/posts/delete-post/${postId}`);
+};
+
 export const useCreatePost = () =>
   useMutation({
     mutationFn: createPost,
+  });
+
+export const useDeletePost = () =>
+  useMutation({
+    mutationFn: deletePost,
   });
 
 export const useFetchPosts = () =>

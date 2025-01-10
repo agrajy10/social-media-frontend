@@ -35,7 +35,8 @@ function Post({
   updatedAt,
   author,
   isAuthor = false,
-}: PostType & { isAuthor?: boolean }) {
+  onDeleteBtnClick,
+}: PostType & { isAuthor?: boolean; onDeleteBtnClick?: () => void }) {
   const wasPostUpdated =
     differenceInMilliseconds(new Date(updatedAt), new Date(createdAt)) > 0;
 
@@ -46,7 +47,7 @@ function Post({
     >
       {isAuthor && (
         <Box sx={{ position: "absolute", top: 10, right: 10 }}>
-          <PostUserMenu />
+          <PostUserMenu onDeleteBtnClick={onDeleteBtnClick} />
         </Box>
       )}
       <Typography variant="h4" fontWeight={700}>

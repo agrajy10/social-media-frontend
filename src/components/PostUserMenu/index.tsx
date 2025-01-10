@@ -2,7 +2,11 @@ import { IconButton, Menu, MenuItem } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { MouseEvent, useState } from "react";
 
-function PostUserMenu() {
+interface PostUserMenuProps {
+  onDeleteBtnClick?: () => void;
+}
+
+function PostUserMenu({ onDeleteBtnClick }: PostUserMenuProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const openMenu = (event: MouseEvent<HTMLButtonElement>) => {
@@ -34,7 +38,13 @@ function PostUserMenu() {
         <MenuItem sx={{ fontSize: 12 }} onClick={handleClose}>
           Edit Post
         </MenuItem>
-        <MenuItem sx={{ fontSize: 12 }} onClick={handleClose}>
+        <MenuItem
+          sx={{ fontSize: 12 }}
+          onClick={() => {
+            onDeleteBtnClick?.();
+            handleClose();
+          }}
+        >
           Delete Post
         </MenuItem>
       </Menu>

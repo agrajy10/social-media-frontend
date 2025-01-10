@@ -57,7 +57,11 @@ function a11yProps(index: number) {
 
 function MyProfile() {
   const { user } = useAuth();
-  const { data: posts, isLoading: arePostsLoading } = useFetchMyPosts();
+  const {
+    data: posts,
+    isLoading: arePostsLoading,
+    refetch,
+  } = useFetchMyPosts();
   const [activeTab, setActiveTab] = useState(0);
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
@@ -140,7 +144,7 @@ function MyProfile() {
                     ))}
                   </Stack>
                 )}
-                {posts && <Posts posts={posts} />}
+                {posts && <Posts refetch={refetch} posts={posts} />}
               </TabPanel>
               <TabPanel value={activeTab} index={1}>
                 <UploadProfileImage />

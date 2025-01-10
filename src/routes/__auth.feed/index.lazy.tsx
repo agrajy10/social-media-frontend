@@ -13,7 +13,7 @@ function RouteComponent() {
   const { mutateAsync: createPost, isPending: isCreatingPost } =
     useCreatePost();
   const { enqueueSnackbar } = useSnackbar();
-  const { data: posts, isLoading: arePostsLoading } = useFetchPosts();
+  const { data: posts, isLoading: arePostsLoading, refetch } = useFetchPosts();
 
   const handleCreatePost = async (title: string, content: string) => {
     try {
@@ -38,7 +38,7 @@ function RouteComponent() {
             ))}
           </Stack>
         )}
-        {posts && <Posts posts={posts} />}
+        {posts && <Posts posts={posts} refetch={refetch} />}
       </Box>
     </Container>
   );
