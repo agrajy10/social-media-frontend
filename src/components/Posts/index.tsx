@@ -23,22 +23,17 @@ function Posts({
   refetch?: () => void;
   queryKey?: string[];
 }) {
-  const { user } = useAuth();
   const [dialogOpen, setDialogOpen] = useState<DialogType | null>(null);
   const [postId, setPostId] = useState<number | null>(null);
+  const { user } = useAuth();
   const { mutate: deletePost, isPending: isDeletingPost } = useDeletePost();
   const { mutate: editPost, isPending: isEditingPost } = useEditPost();
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
 
-  const onEditBtnClick = (id: number) => {
+  const onActionBtnClick = (type: DialogType, id: number) => {
     setPostId(id);
-    setDialogOpen(DialogType.EDIT_POST);
-  };
-
-  const onDeleteBtnClick = (id: number) => {
-    setPostId(id);
-    setDialogOpen(DialogType.DELETE_POST);
+    setDialogOpen(type);
   };
 
   const closeDialog = () => {
@@ -93,11 +88,15 @@ function Posts({
       <Stack spacing={2}>
         {posts.map((post) => (
           <Post
-            onDeleteBtnClick={() => onDeleteBtnClick(post.id)}
-            onEditBtnClick={() => onEditBtnClick(post.id)}
+            onEditBtnClick={() =>
+              onActionBtnClick(DialogType.EDIT_POST, post.id)
+            }
+            onDeleteBtnClick={() =>
+              onActionBtnClick(DialogType.DELETE_POST, post.id)
+            }
             key={post.id}
-            {...post}
             isAuthor={post.author.id === user?.id}
+            {...post}
           />
         ))}
       </Stack>
