@@ -3,9 +3,15 @@ import axiosInstance from "../../axios";
 import { User } from "../../types/User";
 import convertToBase64 from "../../utils/convertToBase64";
 import { ChangePasswordFormValues } from "../../components/ManageProfile/ChangePassword";
+import { Post } from "../../types/Post";
 
 const fetchAccountDetails = async (): Promise<User> => {
   const response = await axiosInstance.get("/users/profile");
+  return response.data.data;
+};
+
+const fetchMyPosts = async (): Promise<Post[]> => {
+  const response = await axiosInstance.get("/users/my-posts");
   return response.data.data;
 };
 
@@ -29,6 +35,12 @@ export const useFetchAccountDetails = () =>
     queryKey: ["user", "accountDetails"],
     queryFn: fetchAccountDetails,
     enabled: false,
+  });
+
+export const useFetchMyPosts = () =>
+  useQuery({
+    queryKey: ["user", "myPosts"],
+    queryFn: fetchMyPosts,
   });
 
 export const useUpdateProfileImage = () =>

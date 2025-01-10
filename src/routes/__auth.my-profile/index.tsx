@@ -3,6 +3,8 @@ import {
   Box,
   Container,
   Paper,
+  Skeleton,
+  Stack,
   Tab,
   Tabs,
   Typography,
@@ -12,6 +14,8 @@ import useAuth from "../../hooks/useAuth";
 import { SyntheticEvent, useState } from "react";
 import ChangePassword from "../../components/ManageProfile/ChangePassword";
 import UploadProfileImage from "../../components/ManageProfile/UploadProfileImage";
+import { useFetchMyPosts } from "../../feature/account/queries";
+import Posts from "../../components/Posts";
 
 export const Route = createFileRoute("/__auth/my-profile/")({
   component: MyProfile,
@@ -53,6 +57,7 @@ function a11yProps(index: number) {
 
 function MyProfile() {
   const { user } = useAuth();
+  const { data: posts, isLoading: arePostsLoading } = useFetchMyPosts();
   const [activeTab, setActiveTab] = useState(0);
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
@@ -124,7 +129,18 @@ function MyProfile() {
                 />
               </Tabs>
               <TabPanel value={activeTab} index={0}>
-                Posts
+                {arePostsLoading && (
+                  <Stack spacing={2}>
+                    {Array.from({ length: 8 }).map((_, index) => (
+                      <Skeleton
+                        sx={{ transform: "none" }}
+                        height={200}
+                        key={index}
+                      />
+                    ))}
+                  </Stack>
+                )}
+                {posts && <Posts posts={posts} />}
               </TabPanel>
               <TabPanel value={activeTab} index={1}>
                 <UploadProfileImage />
