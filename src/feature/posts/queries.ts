@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosInstance from "../../axios";
 import { CreatePostFormValues } from "../../components/AddPost";
-import { Post } from "../../types/Post";
+import { Post, PostComment } from "../../types/Post";
 
 const fetchPosts = async (): Promise<Post[]> => {
   const response = await axiosInstance.get("/posts");
@@ -37,8 +37,11 @@ const addComment = async ({
 }: {
   postId: number;
   content: string;
-}): Promise<void> => {
-  await axiosInstance.post(`/posts/${postId}/comments`, { content });
+}): Promise<PostComment> => {
+  const response = await axiosInstance.post(`/posts/${postId}/comments`, {
+    content,
+  });
+  return response.data.data;
 };
 
 export const useCreatePost = () =>

@@ -2,8 +2,9 @@ import { useSnackbar } from "notistack";
 import { useAddComment } from "../../feature/posts/queries";
 import AddComment from "./AddComment";
 import Comment from "./Comment";
-import { PostComment } from "../../types/Post";
+import { Post, PostComment } from "../../types/Post";
 import { Stack, Typography } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 
 type CommentsProps = {
   postId: number;
@@ -12,6 +13,7 @@ type CommentsProps = {
 
 function Comments({ postId, comments }: CommentsProps) {
   const { mutate: addComment, isPending: isAddingComment } = useAddComment();
+  const queryClient = useQueryClient();
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -19,8 +21,15 @@ function Comments({ postId, comments }: CommentsProps) {
     addComment(
       { postId, content },
       {
-        onSuccess: () => {
+        onSuccess: (newComment) => {
           enqueueSnackbar("Comment added successfully", { variant: "success" });
+          queryClient.setQueryData(["posts"], (oldPosts: Post[] = []) => {
+            return oldPosts.map((post) => {
+              if (post.id === newComment.postId)
+                return { ...post, comments: [newComment, ...post.comments] };
+              return post;
+            });
+          });
           resetForm();
         },
         onError: () => {
