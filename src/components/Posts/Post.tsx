@@ -70,7 +70,7 @@ function Post({
         )}
       </Box>
       {parse(content)}
-      {comments?.length > 0 && (
+      {comments && (
         <Comments
           totalComments={_count.comments}
           postId={id}
