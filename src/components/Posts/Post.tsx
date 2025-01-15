@@ -69,9 +69,7 @@ function Post({
         )}
       </Box>
       {parse(content)}
-      <Box>
-        <Comments comments={comments} postId={id} />
-      </Box>
+      {comments?.length > 0 && <Comments postId={id} comments={comments} />}
     </Paper>
   );
 }
