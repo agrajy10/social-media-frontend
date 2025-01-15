@@ -15,6 +15,7 @@ function Post({
   author,
   isAuthor = false,
   comments,
+  _count,
   onDeleteBtnClick,
   onEditBtnClick,
 }: PostType & {
@@ -69,7 +70,13 @@ function Post({
         )}
       </Box>
       {parse(content)}
-      {comments?.length > 0 && <Comments postId={id} comments={comments} />}
+      {comments?.length > 0 && (
+        <Comments
+          totalComments={_count.comments}
+          postId={id}
+          comments={comments}
+        />
+      )}
     </Paper>
   );
 }

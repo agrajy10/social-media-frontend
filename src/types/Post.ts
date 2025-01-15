@@ -6,6 +6,9 @@ export type Post = {
   updatedAt: string;
   author: PostAuthor;
   comments: PostComment[];
+  _count: {
+    comments: number;
+  };
 };
 
 export type PostAuthor = {

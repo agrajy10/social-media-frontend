@@ -9,9 +9,10 @@ import { useQueryClient } from "@tanstack/react-query";
 type CommentsProps = {
   postId: number;
   comments: PostComment[];
+  totalComments: number;
 };
 
-function Comments({ postId, comments }: CommentsProps) {
+function Comments({ postId, comments, totalComments }: CommentsProps) {
   const { mutate: addComment, isPending: isAddingComment } = useAddComment();
   const queryClient = useQueryClient();
 
@@ -51,7 +52,7 @@ function Comments({ postId, comments }: CommentsProps) {
             fontSize={14}
             sx={{ my: 2, pb: 1, borderBottom: "1px solid #efefef" }}
           >
-            Comments
+            Comments ({totalComments})
           </Typography>
           <Stack spacing={1}>
             {comments.map((comment) => (
