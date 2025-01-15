@@ -19,6 +19,7 @@ function RouteComponent() {
     try {
       await createPost({ title, content });
       enqueueSnackbar("Post created successfully", { variant: "success" });
+      refetch();
     } catch (error) {
       enqueueSnackbar("An error occurred. Please try again", {
         variant: "error",
