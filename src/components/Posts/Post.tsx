@@ -1,34 +1,13 @@
-import { Avatar, Box, Paper, Typography } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import { Post as PostType } from "../../types/Post";
 import parse from "html-react-parser";
 import { formatDistanceToNow, differenceInMilliseconds } from "date-fns";
 import PostUserMenu from "../PostUserMenu";
-
-const UserAvatar = ({
-  profileImage,
-  username,
-}: {
-  profileImage: string | null;
-  username: string;
-}) => {
-  if (profileImage) {
-    return (
-      <Avatar
-        sx={{ width: 24, height: 24 }}
-        alt={username}
-        src={profileImage}
-      />
-    );
-  }
-
-  return (
-    <Avatar sx={{ width: 24, height: 24, fontSize: 13 }}>
-      {username.charAt(0).toUpperCase()}
-    </Avatar>
-  );
-};
+import Comments from "../Comments";
+import UserAvatar from "../UserAvatar";
 
 function Post({
+  id,
   title,
   content,
   createdAt,
@@ -89,6 +68,9 @@ function Post({
         )}
       </Box>
       {parse(content)}
+      <Box>
+        <Comments postId={id} />
+      </Box>
     </Paper>
   );
 }
