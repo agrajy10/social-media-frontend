@@ -31,6 +31,16 @@ const deletePost = async (postId: number): Promise<void> => {
   await axiosInstance.delete(`/posts/delete-post/${postId}`);
 };
 
+const addComment = async ({
+  postId,
+  content,
+}: {
+  postId: number;
+  content: string;
+}): Promise<void> => {
+  await axiosInstance.post(`/posts/${postId}/comments`, { content });
+};
+
 export const useCreatePost = () =>
   useMutation({
     mutationFn: createPost,
@@ -50,4 +60,9 @@ export const useFetchPosts = () =>
   useQuery({
     queryKey: ["posts"],
     queryFn: fetchPosts,
+  });
+
+export const useAddComment = () =>
+  useMutation({
+    mutationFn: addComment,
   });
