@@ -14,6 +14,7 @@ function Post({
   updatedAt,
   author,
   isAuthor = false,
+  comments,
   onDeleteBtnClick,
   onEditBtnClick,
 }: PostType & {
@@ -69,7 +70,7 @@ function Post({
       </Box>
       {parse(content)}
       <Box>
-        <Comments postId={id} />
+        <Comments comments={comments} postId={id} />
       </Box>
     </Paper>
   );

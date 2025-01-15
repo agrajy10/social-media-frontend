@@ -2,12 +2,15 @@ import { useSnackbar } from "notistack";
 import { useAddComment } from "../../feature/posts/queries";
 import AddComment from "./AddComment";
 import Comment from "./Comment";
+import { PostComment } from "../../types/Post";
+import { Stack, Typography } from "@mui/material";
 
 type CommentsProps = {
   postId: number;
+  comments: PostComment[];
 };
 
-function Comments({ postId }: CommentsProps) {
+function Comments({ postId, comments }: CommentsProps) {
   const { mutate: addComment, isPending: isAddingComment } = useAddComment();
 
   const { enqueueSnackbar } = useSnackbar();
@@ -32,7 +35,22 @@ function Comments({ postId }: CommentsProps) {
   return (
     <>
       <AddComment isSubmitting={isAddingComment} onSubmit={handleAddComment} />
-      <Comment />
+      {!!comments.length && (
+        <>
+          <Typography
+            fontWeight={700}
+            fontSize={14}
+            sx={{ my: 2, pb: 1, borderBottom: "1px solid #efefef" }}
+          >
+            Comments
+          </Typography>
+          <Stack spacing={1}>
+            {comments.map((comment) => (
+              <Comment key={comment.id} comment={comment} />
+            ))}
+          </Stack>
+        </>
+      )}
     </>
   );
 }
