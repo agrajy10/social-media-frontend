@@ -1,4 +1,4 @@
-import { Box, Button, ButtonBase, Typography } from "@mui/material";
+import { Box, ButtonBase, Stack, Typography } from "@mui/material";
 import UserAvatar from "../UserAvatar";
 import { formatDistanceToNow } from "date-fns";
 import { PostComment } from "../../types/Post";
@@ -8,12 +8,12 @@ import { useState } from "react";
 type CommentProps = {
   comment: PostComment;
   isSubmitting: boolean;
-  onSubmit: (content: string, resetForm: () => void) => void;
+  onSubmit: (parentId: number, content: string, resetForm: () => void) => void;
 };
 
 function Comment({ comment, isSubmitting, onSubmit }: CommentProps) {
   const [reply, setReply] = useState(false);
-  const { author, createdAt, content } = comment;
+  const { id, author, createdAt, content, replies } = comment;
 
   return (
     <Box>
@@ -56,7 +56,9 @@ function Comment({ comment, isSubmitting, onSubmit }: CommentProps) {
           <Box sx={{ mt: 1 }}>
             <AddComment
               isSubmitting={isSubmitting}
-              onSubmit={(content, resetForm) => onSubmit(content, resetForm)}
+              onSubmit={(content, resetForm) =>
+                onSubmit(id, content, resetForm)
+              }
             />
           </Box>
         )}
@@ -67,6 +69,18 @@ function Comment({ comment, isSubmitting, onSubmit }: CommentProps) {
           {reply ? "Cancel" : "Reply"}
         </ButtonBase>
       </Box>
+      {!!replies.length && (
+        <Stack spacing={1} sx={{ pl: 1, pt: 1 }}>
+          {replies.map((reply) => (
+            <Comment
+              key={reply.id}
+              comment={reply}
+              isSubmitting={isSubmitting}
+              onSubmit={onSubmit}
+            />
+          ))}
+        </Stack>
+      )}
     </Box>
   );
 }

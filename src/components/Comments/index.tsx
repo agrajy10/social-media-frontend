@@ -80,9 +80,7 @@ function Comments({ postId, comments, totalComments }: CommentsProps) {
               <Comment
                 key={comment.id}
                 isSubmitting={isReplying}
-                onSubmit={(content, resetForm) =>
-                  replyToComment(comment.id, content, resetForm)
-                }
+                onSubmit={replyToComment}
                 comment={comment}
               />
             ))}

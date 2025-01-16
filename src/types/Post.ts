@@ -26,4 +26,5 @@ export type PostComment = {
   content: string;
   createdAt: string;
   author: PostAuthor;
+  replies: PostComment[];
 };
