@@ -9,6 +9,7 @@ export type Post = {
   _count: {
     comments: number;
   };
+  hasMoreComments: boolean;
 };
 
 export type PostAuthor = {

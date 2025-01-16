@@ -1,10 +1,11 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Paper, Typography, Button } from "@mui/material";
 import { Post as PostType } from "../../types/Post";
 import parse from "html-react-parser";
 import { formatDistanceToNow, differenceInMilliseconds } from "date-fns";
 import PostUserMenu from "../PostUserMenu";
 import Comments from "../Comments";
 import UserAvatar from "../UserAvatar";
+import usePostComments from "../../hooks/usePostComments";
 
 function Post({
   id,
@@ -18,11 +19,20 @@ function Post({
   _count,
   onDeleteBtnClick,
   onEditBtnClick,
+  hasMoreComments,
+  queryKey,
 }: PostType & {
+  queryKey?: string[];
   isAuthor?: boolean;
   onDeleteBtnClick?: () => void;
   onEditBtnClick?: () => void;
 }) {
+  const { setPage } = usePostComments({
+    postId: id,
+    hasMoreComments,
+    queryKey,
+  });
+
   const wasPostUpdated =
     differenceInMilliseconds(new Date(updatedAt), new Date(createdAt)) > 0;
 
@@ -76,6 +86,16 @@ function Post({
           postId={id}
           comments={comments}
         />
+      )}
+      {hasMoreComments && (
+        <Button
+          onClick={() => setPage((prev) => (prev === 0 ? 2 : prev + 1))}
+          variant="outlined"
+          sx={{ mt: 1, bgcolor: "#fafafa" }}
+          fullWidth
+        >
+          View more comments
+        </Button>
       )}
     </Paper>
   );

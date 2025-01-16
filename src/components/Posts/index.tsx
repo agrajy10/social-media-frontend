@@ -88,6 +88,7 @@ function Posts({
       <Stack spacing={2}>
         {posts.map((post) => (
           <Post
+            queryKey={queryKey}
             onEditBtnClick={() =>
               onActionBtnClick(DialogType.EDIT_POST, post.id)
             }
