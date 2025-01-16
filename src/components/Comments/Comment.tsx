@@ -1,13 +1,18 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Button, ButtonBase, Typography } from "@mui/material";
 import UserAvatar from "../UserAvatar";
 import { formatDistanceToNow } from "date-fns";
 import { PostComment } from "../../types/Post";
+import AddComment from "./AddComment";
+import { useState } from "react";
 
 type CommentProps = {
   comment: PostComment;
+  isSubmitting: boolean;
+  onSubmit: (content: string, resetForm: () => void) => void;
 };
 
-function Comment({ comment }: CommentProps) {
+function Comment({ comment, isSubmitting, onSubmit }: CommentProps) {
+  const [reply, setReply] = useState(false);
   const { author, createdAt, content } = comment;
 
   return (
@@ -47,6 +52,20 @@ function Comment({ comment }: CommentProps) {
             {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
           </Typography>
         </Box>
+        {reply && (
+          <Box sx={{ mt: 1 }}>
+            <AddComment
+              isSubmitting={isSubmitting}
+              onSubmit={(content, resetForm) => onSubmit(content, resetForm)}
+            />
+          </Box>
+        )}
+        <ButtonBase
+          onClick={() => setReply((prev) => !prev)}
+          sx={{ fontSize: 10, mt: 0.5 }}
+        >
+          {reply ? "Cancel" : "Reply"}
+        </ButtonBase>
       </Box>
     </Box>
   );

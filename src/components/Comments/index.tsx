@@ -1,5 +1,5 @@
 import { useSnackbar } from "notistack";
-import { useAddComment } from "../../feature/posts/queries";
+import { useAddComment, useReplyComment } from "../../feature/posts/queries";
 import AddComment from "./AddComment";
 import Comment from "./Comment";
 import { Post, PostComment } from "../../types/Post";
@@ -14,6 +14,7 @@ type CommentsProps = {
 
 function Comments({ postId, comments, totalComments }: CommentsProps) {
   const { mutate: addComment, isPending: isAddingComment } = useAddComment();
+  const { mutate: replyComment, isPending: isReplying } = useReplyComment();
   const queryClient = useQueryClient();
 
   const { enqueueSnackbar } = useSnackbar();
@@ -42,6 +43,26 @@ function Comments({ postId, comments, totalComments }: CommentsProps) {
     );
   };
 
+  const replyToComment = (
+    commentId: number,
+    content: string,
+    resetForm: () => void
+  ) => {
+    replyComment(
+      { postId, commentId, content },
+      {
+        onSuccess: () => {
+          resetForm();
+        },
+        onError: () => {
+          enqueueSnackbar("An error occurred. Please try again", {
+            variant: "error",
+          });
+        },
+      }
+    );
+  };
+
   return (
     <>
       <AddComment isSubmitting={isAddingComment} onSubmit={handleAddComment} />
@@ -56,7 +77,14 @@ function Comments({ postId, comments, totalComments }: CommentsProps) {
           </Typography>
           <Stack spacing={1}>
             {comments.map((comment) => (
-              <Comment key={comment.id} comment={comment} />
+              <Comment
+                key={comment.id}
+                isSubmitting={isReplying}
+                onSubmit={(content, resetForm) =>
+                  replyToComment(comment.id, content, resetForm)
+                }
+                comment={comment}
+              />
             ))}
           </Stack>
         </>

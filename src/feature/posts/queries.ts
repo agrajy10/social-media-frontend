@@ -44,6 +44,24 @@ const addComment = async ({
   return response.data.data;
 };
 
+const replyComment = async ({
+  postId,
+  commentId,
+  content,
+}: {
+  postId: number;
+  commentId: number;
+  content: string;
+}): Promise<PostComment> => {
+  const response = await axiosInstance.post(
+    `/posts/${postId}/comments/${commentId}/replies`,
+    {
+      content,
+    }
+  );
+  return response.data.data;
+};
+
 export const useCreatePost = () =>
   useMutation({
     mutationFn: createPost,
@@ -68,4 +86,9 @@ export const useFetchPosts = () =>
 export const useAddComment = () =>
   useMutation({
     mutationFn: addComment,
+  });
+
+export const useReplyComment = () =>
+  useMutation({
+    mutationFn: replyComment,
   });
