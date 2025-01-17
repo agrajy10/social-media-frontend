@@ -5,6 +5,7 @@ import Comment from "./Comment";
 import { Post, PostComment } from "../../types/Post";
 import { Stack, Typography } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
+import insertCommentReply from "../../utils/insertCommentReply";
 
 type CommentsProps = {
   postId: number;
@@ -51,7 +52,18 @@ function Comments({ postId, comments, totalComments }: CommentsProps) {
     replyComment(
       { postId, commentId, content },
       {
-        onSuccess: () => {
+        onSuccess: (newComment) => {
+          queryClient.setQueryData(["posts"], (oldPosts: Post[]) => {
+            return oldPosts.map((post) => {
+              if (post.id === newComment.postId) {
+                return {
+                  ...post,
+                  comments: insertCommentReply(post.comments, newComment),
+                };
+              }
+              return post;
+            });
+          });
           resetForm();
         },
         onError: () => {
