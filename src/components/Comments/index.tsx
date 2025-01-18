@@ -13,7 +13,7 @@ type CommentsProps = {
   totalComments: number;
 };
 
-function Comments({ postId, comments }: CommentsProps) {
+function Comments({ postId, comments, totalComments }: CommentsProps) {
   const { mutate: addComment, isPending: isAddingComment } = useAddComment();
   const { mutate: replyComment, isPending: isReplying } = useReplyComment();
   const queryClient = useQueryClient();
@@ -100,7 +100,7 @@ function Comments({ postId, comments }: CommentsProps) {
             fontSize={14}
             sx={{ my: 2, pb: 1, borderBottom: "1px solid #efefef" }}
           >
-            Comments ({comments.length})
+            Comments ({totalComments})
           </Typography>
           <Stack spacing={1}>
             {comments.map((comment) => (

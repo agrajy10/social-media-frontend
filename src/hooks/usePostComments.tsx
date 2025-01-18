@@ -33,16 +33,21 @@ function usePostComments({
 
   useEffect(() => {
     if (data && queryKey?.length) {
-      queryClient.setQueryData(queryKey, (posts: Post[]) => {
-        return posts.map((post) => {
-          if (post.id === postId)
-            return {
-              ...post,
-              comments: [...post.comments, ...data.data],
-              hasMoreComments: data.hasMore,
-            };
-          return post;
-        });
+      queryClient.setQueryData(queryKey, (oldPosts: any) => {
+        let newPosts = JSON.parse(JSON.stringify(oldPosts));
+        for (let page = 0; page < newPosts.pages.length; page++) {
+          let updated = false;
+          for (const post of newPosts.pages[page].data) {
+            if (post.id === postId) {
+              post.comments = [...data.data, ...post.comments];
+              post.hasMoreComments = data.hasMore;
+              updated = true;
+              break;
+            }
+          }
+          if (updated) break;
+        }
+        return newPosts;
       });
     }
   }, [data]);
