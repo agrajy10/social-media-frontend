@@ -36,6 +36,7 @@ function Comments({ postId, comments, totalComments }: CommentsProps) {
                     { ...newComment, replies: [] },
                     ...post.comments,
                   ];
+                  post._count.comments++;
                   updated = true;
                   break;
                 }
