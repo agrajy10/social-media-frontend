@@ -2,7 +2,7 @@ import { useSnackbar } from "notistack";
 import { useAddComment, useReplyComment } from "../../feature/posts/queries";
 import AddComment from "./AddComment";
 import Comment from "./Comment";
-import { Post, PostComment } from "../../types/Post";
+import { PostComment } from "../../types/Post";
 import { Stack, Typography } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import insertCommentReply from "../../utils/insertCommentReply";
@@ -19,6 +19,31 @@ function Comments({ postId, comments, totalComments }: CommentsProps) {
   const queryClient = useQueryClient();
 
   const { enqueueSnackbar } = useSnackbar();
+  const updatePosts = (
+    oldPosts: any,
+    postId: number,
+    newComment: any,
+    isReply: boolean = false
+  ) => {
+    let newPosts = JSON.parse(JSON.stringify(oldPosts));
+    for (let page = 0; page < newPosts.pages.length; page++) {
+      let updated = false;
+      for (const post of newPosts.pages[page].data) {
+        if (post.id === postId) {
+          if (isReply) {
+            post.comments = insertCommentReply(post.comments, newComment);
+          } else {
+            post.comments = [{ ...newComment, replies: [] }, ...post.comments];
+            post._count.comments++;
+          }
+          updated = true;
+          break;
+        }
+      }
+      if (updated) break;
+    }
+    return newPosts;
+  };
 
   const handleAddComment = (content: string, resetForm: () => void) => {
     addComment(
@@ -26,25 +51,9 @@ function Comments({ postId, comments, totalComments }: CommentsProps) {
       {
         onSuccess: (newComment) => {
           enqueueSnackbar("Comment added successfully", { variant: "success" });
-          queryClient.setQueryData(["posts"], (oldPosts: any) => {
-            let newPosts = JSON.parse(JSON.stringify(oldPosts));
-            for (let page = 0; page < newPosts.pages.length; page++) {
-              let updated = false;
-              for (const post of newPosts.pages[page].data) {
-                if (post.id === newComment.postId) {
-                  post.comments = [
-                    { ...newComment, replies: [] },
-                    ...post.comments,
-                  ];
-                  post._count.comments++;
-                  updated = true;
-                  break;
-                }
-              }
-              if (updated) break;
-            }
-            return newPosts;
-          });
+          queryClient.setQueryData(["posts"], (oldPosts: any) =>
+            updatePosts(oldPosts, newComment.postId, newComment)
+          );
           resetForm();
         },
         onError: () => {
@@ -65,21 +74,9 @@ function Comments({ postId, comments, totalComments }: CommentsProps) {
       { postId, commentId, content },
       {
         onSuccess: (newComment) => {
-          queryClient.setQueryData(["posts"], (oldPosts: any) => {
-            let newPosts = JSON.parse(JSON.stringify(oldPosts));
-            for (let page = 0; page < newPosts.pages.length; page++) {
-              let updated = false;
-              for (const post of newPosts.pages[page].data) {
-                if (post.id === newComment.postId) {
-                  post.comments = insertCommentReply(post.comments, newComment);
-                  updated = true;
-                  break;
-                }
-              }
-              if (updated) break;
-            }
-            return newPosts;
-          });
+          queryClient.setQueryData(["posts"], (oldPosts: any) =>
+            updatePosts(oldPosts, newComment.postId, newComment, true)
+          );
           resetForm();
         },
         onError: () => {
@@ -90,7 +87,6 @@ function Comments({ postId, comments, totalComments }: CommentsProps) {
       }
     );
   };
-
   return (
     <>
       <AddComment isSubmitting={isAddingComment} onSubmit={handleAddComment} />
