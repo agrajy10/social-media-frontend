@@ -4,6 +4,8 @@ import AddPost from "../../components/AddPost";
 import { useCreatePost, useFetchPosts } from "../../feature/posts/queries";
 import { useSnackbar } from "notistack";
 import Posts from "../../components/Posts";
+import { useInView } from "react-intersection-observer";
+import { useEffect } from "react";
 
 export const Route = createLazyFileRoute("/__auth/feed/")({
   component: RouteComponent,
@@ -13,7 +15,23 @@ function RouteComponent() {
   const { mutateAsync: createPost, isPending: isCreatingPost } =
     useCreatePost();
   const { enqueueSnackbar } = useSnackbar();
-  const { data: posts, isLoading: arePostsLoading, refetch } = useFetchPosts();
+  const { ref, inView } = useInView({
+    threshold: 0,
+    rootMargin: "100px 0px 0px 0px",
+  });
+  const {
+    data,
+    isLoading: arePostsLoading,
+    refetch,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useFetchPosts();
+
+  useEffect(() => {
+    if (!inView) return;
+    fetchNextPage();
+  }, [inView]);
 
   const handleCreatePost = async (title: string, content: string) => {
     try {
@@ -32,16 +50,21 @@ function RouteComponent() {
     <Container maxWidth="md" sx={{ py: 4 }}>
       <AddPost onSubmit={handleCreatePost} isSubmitting={isCreatingPost} />
       <Box sx={{ my: 6 }}>
-        {arePostsLoading && (
-          <Stack spacing={2}>
+        {data && (
+          <Posts
+            queryKey={["posts"]}
+            posts={data.pages.map((page) => page.data).flat()}
+            refetch={refetch}
+          />
+        )}
+        {(arePostsLoading || isFetchingNextPage) && (
+          <Stack sx={{ mt: 2 }} spacing={2}>
             {Array.from({ length: 8 }).map((_, index) => (
               <Skeleton sx={{ transform: "none" }} height={200} key={index} />
             ))}
           </Stack>
         )}
-        {posts && (
-          <Posts queryKey={["posts"]} posts={posts} refetch={refetch} />
-        )}
+        {hasNextPage && <Box ref={ref}></Box>}
       </Box>
     </Container>
   );

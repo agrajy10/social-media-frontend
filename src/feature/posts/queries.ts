@@ -1,11 +1,17 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import axiosInstance from "../../axios";
 import { CreatePostFormValues } from "../../components/AddPost";
 import { Post, PostComment } from "../../types/Post";
 
-const fetchPosts = async (): Promise<Post[]> => {
-  const response = await axiosInstance.get("/posts");
-  return response.data.data;
+const fetchPosts = async ({
+  pageParam,
+}: {
+  pageParam: number;
+}): Promise<{ data: Post[]; hasMore: boolean; page: number }> => {
+  const response = await axiosInstance.get("/posts", {
+    params: { limit: 10, page: pageParam },
+  });
+  return response.data;
 };
 
 const createPost = async (values: CreatePostFormValues): Promise<Post> => {
@@ -78,9 +84,16 @@ export const useDeletePost = () =>
   });
 
 export const useFetchPosts = () =>
-  useQuery({
+  useInfiniteQuery({
     queryKey: ["posts"],
     queryFn: fetchPosts,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _, lastPageParam) => {
+      if (lastPage.hasMore) {
+        return lastPageParam + 1;
+      }
+      return undefined;
+    },
   });
 
 export const useAddComment = () =>
