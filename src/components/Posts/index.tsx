@@ -7,7 +7,6 @@ import { useState } from "react";
 import { useDeletePost, useEditPost } from "../../feature/posts/queries";
 import { useSnackbar } from "notistack";
 import EditPostDialog from "../EditPostDialog";
-import { useQueryClient } from "@tanstack/react-query";
 
 enum DialogType {
   EDIT_POST = "EDIT_POST",
@@ -29,7 +28,6 @@ function Posts({
   const { mutate: deletePost, isPending: isDeletingPost } = useDeletePost();
   const { mutate: editPost, isPending: isEditingPost } = useEditPost();
   const { enqueueSnackbar } = useSnackbar();
-  const queryClient = useQueryClient();
 
   const onActionBtnClick = (type: DialogType, id: number) => {
     setPostId(id);
@@ -62,16 +60,9 @@ function Posts({
     editPost(
       { postId, values },
       {
-        onSuccess: (updatedPost) => {
+        onSuccess: () => {
           enqueueSnackbar("Post updated successfully", { variant: "success" });
-          if (queryKey?.length) {
-            queryClient.setQueryData(queryKey, (oldPosts: PostType[] = []) => {
-              return oldPosts.map((post) => {
-                if (post.id === updatedPost.id) return updatedPost;
-                return post;
-              });
-            });
-          }
+          refetch?.();
           closeDialog();
         },
         onError: () => {
