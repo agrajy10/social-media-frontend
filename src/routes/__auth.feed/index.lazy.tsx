@@ -6,6 +6,8 @@ import { useSnackbar } from "notistack";
 import Posts from "../../components/Posts";
 import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Post } from "../../types/Post";
 
 export const Route = createLazyFileRoute("/__auth/feed/")({
   component: RouteComponent,
@@ -14,6 +16,7 @@ export const Route = createLazyFileRoute("/__auth/feed/")({
 function RouteComponent() {
   const { mutateAsync: createPost, isPending: isCreatingPost } =
     useCreatePost();
+  const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
   const { ref, inView } = useInView({
     threshold: 0,
@@ -35,7 +38,18 @@ function RouteComponent() {
 
   const handleCreatePost = async (title: string, content: string) => {
     try {
-      await createPost({ title, content });
+      await createPost(
+        { title, content },
+        {
+          onSuccess: (newPost: Post) => {
+            queryClient.setQueryData(["posts"], (oldPosts: any) => {
+              const newPosts = { ...oldPosts };
+              newPosts.pages[0].data = [newPost, ...newPosts.pages[0].data];
+              return newPosts;
+            });
+          },
+        }
+      );
       enqueueSnackbar("Post created successfully", { variant: "success" });
       refetch();
     } catch (error) {
