@@ -26,15 +26,23 @@ function Comments({ postId, comments }: CommentsProps) {
       {
         onSuccess: (newComment) => {
           enqueueSnackbar("Comment added successfully", { variant: "success" });
-          queryClient.setQueryData(["posts"], (oldPosts: Post[] = []) => {
-            return oldPosts.map((post) => {
-              if (post.id === newComment.postId)
-                return {
-                  ...post,
-                  comments: [{ ...newComment, replies: [] }, ...post.comments],
-                };
-              return post;
-            });
+          queryClient.setQueryData(["posts"], (oldPosts: any) => {
+            let newPosts = JSON.parse(JSON.stringify(oldPosts));
+            for (let page = 0; page < newPosts.pages.length; page++) {
+              let updated = false;
+              for (const post of newPosts.pages[page].data) {
+                if (post.id === newComment.postId) {
+                  post.comments = [
+                    { ...newComment, replies: [] },
+                    ...post.comments,
+                  ];
+                  updated = true;
+                  break;
+                }
+              }
+              if (updated) break;
+            }
+            return newPosts;
           });
           resetForm();
         },
@@ -56,16 +64,20 @@ function Comments({ postId, comments }: CommentsProps) {
       { postId, commentId, content },
       {
         onSuccess: (newComment) => {
-          queryClient.setQueryData(["posts"], (oldPosts: Post[]) => {
-            return oldPosts.map((post) => {
-              if (post.id === newComment.postId) {
-                return {
-                  ...post,
-                  comments: insertCommentReply(post.comments, newComment),
-                };
+          queryClient.setQueryData(["posts"], (oldPosts: any) => {
+            let newPosts = JSON.parse(JSON.stringify(oldPosts));
+            for (let page = 0; page < newPosts.pages.length; page++) {
+              let updated = false;
+              for (const post of newPosts.pages[page].data) {
+                if (post.id === newComment.postId) {
+                  post.comments = insertCommentReply(post.comments, newComment);
+                  updated = true;
+                  break;
+                }
               }
-              return post;
-            });
+              if (updated) break;
+            }
+            return newPosts;
           });
           resetForm();
         },
