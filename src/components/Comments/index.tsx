@@ -13,7 +13,7 @@ type CommentsProps = {
   totalComments: number;
 };
 
-function Comments({ postId, comments, totalComments }: CommentsProps) {
+function Comments({ postId, comments }: CommentsProps) {
   const { mutate: addComment, isPending: isAddingComment } = useAddComment();
   const { mutate: replyComment, isPending: isReplying } = useReplyComment();
   const queryClient = useQueryClient();
@@ -29,7 +29,10 @@ function Comments({ postId, comments, totalComments }: CommentsProps) {
           queryClient.setQueryData(["posts"], (oldPosts: Post[] = []) => {
             return oldPosts.map((post) => {
               if (post.id === newComment.postId)
-                return { ...post, comments: [newComment, ...post.comments] };
+                return {
+                  ...post,
+                  comments: [{ ...newComment, replies: [] }, ...post.comments],
+                };
               return post;
             });
           });
@@ -85,7 +88,7 @@ function Comments({ postId, comments, totalComments }: CommentsProps) {
             fontSize={14}
             sx={{ my: 2, pb: 1, borderBottom: "1px solid #efefef" }}
           >
-            Comments ({totalComments})
+            Comments ({comments.length})
           </Typography>
           <Stack spacing={1}>
             {comments.map((comment) => (
