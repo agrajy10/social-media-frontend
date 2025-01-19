@@ -68,6 +68,22 @@ const replyComment = async ({
   return response.data.data;
 };
 
+const likePost = async ({
+  postId,
+  isLiked,
+}: {
+  postId: number;
+  isLiked: boolean;
+}) => {
+  let response;
+  if (!isLiked) {
+    response = await axiosInstance.post(`/posts/${postId}/likes`);
+  } else {
+    response = await axiosInstance.delete(`/posts/${postId}/likes`);
+  }
+  return response.data.data;
+};
+
 export const useCreatePost = () =>
   useMutation({
     mutationFn: createPost,
@@ -104,4 +120,9 @@ export const useAddComment = () =>
 export const useReplyComment = () =>
   useMutation({
     mutationFn: replyComment,
+  });
+
+export const useLikePost = () =>
+  useMutation({
+    mutationFn: likePost,
   });

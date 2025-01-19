@@ -8,8 +8,10 @@ export type Post = {
   comments: PostComment[];
   _count: {
     comments: number;
+    likes: number;
   };
   hasMoreComments: boolean;
+  isLiked: boolean;
 };
 
 export type PostAuthor = {

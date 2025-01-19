@@ -4,9 +4,14 @@ import Post from "./Post";
 import useAuth from "../../hooks/useAuth";
 import DeletePostDialog from "../DeletePostDialog";
 import { useState } from "react";
-import { useDeletePost, useEditPost } from "../../feature/posts/queries";
+import {
+  useDeletePost,
+  useEditPost,
+  useLikePost,
+} from "../../feature/posts/queries";
 import { useSnackbar } from "notistack";
 import EditPostDialog from "../EditPostDialog";
+import { useQueryClient } from "@tanstack/react-query";
 
 enum DialogType {
   EDIT_POST = "EDIT_POST",
@@ -27,6 +32,8 @@ function Posts({
   const { user } = useAuth();
   const { mutate: deletePost, isPending: isDeletingPost } = useDeletePost();
   const { mutate: editPost, isPending: isEditingPost } = useEditPost();
+  const { mutate: likePost } = useLikePost();
+  const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
 
   const onActionBtnClick = (type: DialogType, id: number) => {
@@ -74,6 +81,37 @@ function Posts({
     );
   };
 
+  const handlePostLike = (postId: number, isLiked: boolean) => {
+    likePost(
+      { postId, isLiked },
+      {
+        onSuccess: (newCount) => {
+          queryClient.setQueryData(["posts"], (oldPosts: any) => {
+            const newPosts = JSON.parse(JSON.stringify(oldPosts));
+            for (let page = 0; page < newPosts.pages.length; page++) {
+              let updated = false;
+              for (const post of newPosts.pages[page].data) {
+                if (post.id === postId) {
+                  post.isLiked = !isLiked;
+                  post._count.likes = newCount;
+                  updated = true;
+                  break;
+                }
+              }
+              if (updated) break;
+            }
+            return newPosts;
+          });
+        },
+        onError: () => {
+          enqueueSnackbar("An error occurred. Please try again", {
+            variant: "error",
+          });
+        },
+      }
+    );
+  };
+
   return (
     <>
       <Stack spacing={2}>
@@ -86,6 +124,7 @@ function Posts({
             onDeleteBtnClick={() =>
               onActionBtnClick(DialogType.DELETE_POST, post.id)
             }
+            onLikeBtnClick={() => handlePostLike(post.id, post.isLiked)}
             key={post.id}
             isAuthor={post.author.id === user?.id}
             {...post}

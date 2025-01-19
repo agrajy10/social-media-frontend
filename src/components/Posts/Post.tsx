@@ -6,6 +6,7 @@ import PostUserMenu from "../PostUserMenu";
 import Comments from "../Comments";
 import UserAvatar from "../UserAvatar";
 import usePostComments from "../../hooks/usePostComments";
+import LikeButton from "../LikeButton";
 
 function Post({
   id,
@@ -21,11 +22,14 @@ function Post({
   onEditBtnClick,
   hasMoreComments,
   queryKey,
+  onLikeBtnClick,
+  isLiked,
 }: PostType & {
   queryKey?: string[];
   isAuthor?: boolean;
   onDeleteBtnClick?: () => void;
   onEditBtnClick?: () => void;
+  onLikeBtnClick?: () => void;
 }) {
   const { setPage } = usePostComments({
     postId: id,
@@ -77,6 +81,15 @@ function Post({
             Last updated:{" "}
             {formatDistanceToNow(new Date(updatedAt), { addSuffix: true })}
           </Typography>
+        )}
+        {!!onLikeBtnClick && (
+          <Box sx={{ ml: "auto" }}>
+            <LikeButton
+              onClick={onLikeBtnClick}
+              isLiked={isLiked}
+              likes={_count.likes}
+            />
+          </Box>
         )}
       </Box>
       {parse(content)}
