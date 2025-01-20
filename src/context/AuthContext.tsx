@@ -3,6 +3,7 @@ import { User } from "../types/User";
 import { useFetchAccountDetails } from "../feature/account/queries";
 import { Box, CircularProgress } from "@mui/material";
 import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 export interface AuthContextType {
   user: User | null;
   setUser: (user: User | null) => void;
@@ -17,6 +18,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     fetchAccountDetails();
@@ -34,6 +36,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     localStorage.removeItem("token");
     navigate({ to: "/" });
+    queryClient.invalidateQueries();
   };
 
   return (
