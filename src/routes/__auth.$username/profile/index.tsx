@@ -8,28 +8,28 @@ import {
   Tab,
   Tabs,
   Typography,
-} from "@mui/material";
-import { createFileRoute } from "@tanstack/react-router";
-import useAuth from "../../hooks/useAuth";
-import { SyntheticEvent, useState } from "react";
-import ChangePassword from "../../components/ManageProfile/ChangePassword";
-import UploadProfileImage from "../../components/ManageProfile/UploadProfileImage";
-import { useFetchMyPosts } from "../../feature/account/queries";
-import Posts from "../../components/Posts";
+} from '@mui/material'
+import { createFileRoute } from '@tanstack/react-router'
+import useAuth from '../../../hooks/useAuth'
+import { SyntheticEvent, useState } from 'react'
+import ChangePassword from '../../../components/ManageProfile/ChangePassword'
+import UploadProfileImage from '../../../components/ManageProfile/UploadProfileImage'
+import { useFetchMyPosts } from '../../../feature/account/queries'
+import Posts from '../../../components/Posts'
 
-export const Route = createFileRoute("/__auth/my-profile/")({
+export const Route = createFileRoute('/__auth/$username/profile/')({
   component: MyProfile,
-});
+})
 
 interface TabPanelProps {
-  children?: React.ReactNode;
-  dir?: string;
-  index: number;
-  value: number;
+  children?: React.ReactNode
+  dir?: string
+  index: number
+  value: number
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, ...other } = props
 
   return (
     <div
@@ -45,28 +45,24 @@ function TabPanel(props: TabPanelProps) {
         </Box>
       )}
     </div>
-  );
+  )
 }
 
 function a11yProps(index: number) {
   return {
     id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`,
-  };
+    'aria-controls': `full-width-tabpanel-${index}`,
+  }
 }
 
 function MyProfile() {
-  const { user } = useAuth();
-  const {
-    data: posts,
-    isLoading: arePostsLoading,
-    refetch,
-  } = useFetchMyPosts();
-  const [activeTab, setActiveTab] = useState(0);
+  const { user } = useAuth()
+  const { data: posts, isLoading: arePostsLoading, refetch } = useFetchMyPosts()
+  const [activeTab, setActiveTab] = useState(0)
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
+    setActiveTab(newValue)
+  }
 
   return (
     <>
@@ -75,9 +71,9 @@ function MyProfile() {
           <>
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 gap: 4,
               }}
             >
@@ -109,7 +105,7 @@ function MyProfile() {
                 </Typography>
               </Box>
             </Box>
-            <Paper sx={{ mt: 10, overflow: "hidden" }}>
+            <Paper sx={{ mt: 10, overflow: 'hidden' }}>
               <Tabs
                 variant="fullWidth"
                 value={activeTab}
@@ -137,7 +133,7 @@ function MyProfile() {
                   <Stack spacing={2}>
                     {Array.from({ length: 8 }).map((_, index) => (
                       <Skeleton
-                        sx={{ transform: "none" }}
+                        sx={{ transform: 'none' }}
                         height={200}
                         key={index}
                       />
@@ -146,7 +142,7 @@ function MyProfile() {
                 )}
                 {posts && (
                   <Posts
-                    queryKey={["user", "myPosts"]}
+                    queryKey={['user', 'myPosts']}
                     posts={posts}
                     refetch={refetch}
                   />
@@ -163,5 +159,5 @@ function MyProfile() {
         )}
       </Container>
     </>
-  );
+  )
 }

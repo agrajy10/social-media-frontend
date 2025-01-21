@@ -104,7 +104,7 @@ function TopBar() {
                 }}
                 onClick={closeMenu}
               >
-                <Link component={TanstackLink} to="/my-profile">
+                <Link component={TanstackLink} to={`/${user.username}/profile`}>
                   <Typography>Profile</Typography>
                 </Link>
               </MenuItem>

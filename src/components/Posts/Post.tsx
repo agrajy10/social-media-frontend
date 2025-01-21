@@ -7,6 +7,7 @@ import Comments from "../Comments";
 import UserAvatar from "../UserAvatar";
 import usePostComments from "../../hooks/usePostComments";
 import LikeButton from "../LikeButton";
+import { Link } from "@tanstack/react-router";
 
 function Post({
   id,
@@ -72,7 +73,20 @@ function Post({
           profileImage={author.profileImage}
           username={author.username}
         />
-        <Typography variant="caption">{author.username}</Typography>-
+        <Typography
+          sx={{ "& a": { textDecoration: "none", color: "inherit" } }}
+          variant="caption"
+        >
+          <Link
+            to="/$username/profile"
+            params={{
+              username: author.username,
+            }}
+          >
+            {author.username}
+          </Link>
+        </Typography>
+        -
         <Typography variant="caption">
           {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
         </Typography>

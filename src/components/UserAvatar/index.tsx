@@ -1,4 +1,5 @@
-import { Avatar } from "@mui/material";
+import { Avatar, Box } from "@mui/material";
+import { Link } from "@tanstack/react-router";
 
 type UserAvatarProps = {
   profileImage: string | null;
@@ -17,18 +18,36 @@ const UserAvatar = ({
 }: UserAvatarProps) => {
   if (profileImage) {
     return (
-      <Avatar
-        sx={{ width: width, height: height }}
-        alt={username}
-        src={profileImage}
-      />
+      <Box sx={{ "& a": { textDecoration: "none" } }}>
+        <Link
+          to="/$username/profile"
+          params={{
+            username,
+          }}
+        >
+          <Avatar
+            sx={{ width: width, height: height }}
+            alt={username}
+            src={profileImage}
+          />
+        </Link>
+      </Box>
     );
   }
 
   return (
-    <Avatar sx={{ width: width, height: width, fontSize }}>
-      {username.charAt(0).toUpperCase()}
-    </Avatar>
+    <Box sx={{ "& a": { textDecoration: "none" } }}>
+      <Link
+        to="/$username/profile"
+        params={{
+          username,
+        }}
+      >
+        <Avatar sx={{ width: width, height: width, fontSize }}>
+          {username.charAt(0).toUpperCase()}
+        </Avatar>
+      </Link>
+    </Box>
   );
 };
 

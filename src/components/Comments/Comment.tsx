@@ -4,6 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { PostComment } from "../../types/Post";
 import AddComment from "./AddComment";
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 
 type CommentProps = {
   comment: PostComment;
@@ -44,8 +45,17 @@ function Comment({ comment, isSubmitting, onSubmit }: CommentProps) {
             profileImage={author.profileImage}
             username={author.username}
           />
-          <Typography variant="caption" fontSize={10}>
-            {author.username}
+          <Typography
+            sx={{ "& a": { textDecoration: "none", color: "inherit" } }}
+            variant="caption"
+            fontSize={10}
+          >
+            <Link
+              to="/$username/profile"
+              params={{ username: author.username }}
+            >
+              {author.username}
+            </Link>
           </Typography>
           -
           <Typography variant="caption" fontSize={10}>
