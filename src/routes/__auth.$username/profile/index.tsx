@@ -1,6 +1,7 @@
 import {
   Avatar,
   Box,
+  Button,
   CircularProgress,
   Container,
   Paper,
@@ -25,7 +26,9 @@ import {
   useFetchMyPosts,
 } from "../../../feature/account/queries";
 import Posts from "../../../components/Posts";
-
+import AddIcon from "@mui/icons-material/Add";
+import CheckIcon from "@mui/icons-material/Check";
+import UnfollowUserDialog from "../../../components/UnfollowUserDialog";
 export const Route = createFileRoute("/__auth/$username/profile/")({
   component: MyProfile,
 });
@@ -75,10 +78,15 @@ function MyProfile() {
   //   refetch,
   // } = useFetchMyPosts();
   const [activeTab, setActiveTab] = useState(0);
+  const [dialogOpen, setDialogOpen] = useState<null | string>(null);
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
+
+  const openDialog = (type: string) => setDialogOpen(type);
+
+  const closeDialog = () => setDialogOpen(null);
 
   if (isProfileLoading) {
     return (
@@ -141,6 +149,61 @@ function MyProfile() {
                   >
                     {profile.username}
                   </Typography>
+                  {!isOwnProfile && (
+                    <>
+                      {!profile.isFollowing && (
+                        <Button
+                          startIcon={<AddIcon />}
+                          sx={{ mt: 2 }}
+                          variant="contained"
+                          color="primary"
+                        >
+                          Follow
+                        </Button>
+                      )}
+                      {profile.isFollowing && (
+                        <Button
+                          onClick={() => openDialog("unfollow")}
+                          startIcon={<CheckIcon />}
+                          sx={{ mt: 2 }}
+                          variant="outlined"
+                          color="primary"
+                        >
+                          Following
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  maxWidth: "420px",
+                  mx: "auto",
+                  mt: 5,
+                  textAlign: "center",
+                  display: "flex",
+                  alignItems: "flex-end",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box>
+                  <Typography fontWeight={700} lineHeight={1.2} fontSize={30}>
+                    {profile.totalPosts}
+                  </Typography>
+                  <Typography>Posts</Typography>
+                </Box>
+                <Box>
+                  <Typography fontWeight={700} lineHeight={1.2} fontSize={30}>
+                    {profile.followers}
+                  </Typography>
+                  <Typography>Followers</Typography>
+                </Box>
+                <Box>
+                  <Typography fontWeight={700} lineHeight={1.2} fontSize={30}>
+                    {profile.following}
+                  </Typography>
+                  <Typography>Following</Typography>
                 </Box>
               </Box>
               {isOwnProfile && (
@@ -198,6 +261,12 @@ function MyProfile() {
             </>
           )}
         </Container>
+        <UnfollowUserDialog
+          isSubmitting={false}
+          open={dialogOpen === "unfollow"}
+          handleClose={closeDialog}
+          handleUserUnfollow={() => {}}
+        />
       </>
     );
   }

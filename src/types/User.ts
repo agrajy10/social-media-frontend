@@ -6,4 +6,8 @@ export type User = {
   username: string;
   createdAt: string;
   updatedAt: string;
+  isFollowing: boolean;
+  followers: number;
+  following: number;
+  totalPosts: number;
 };
