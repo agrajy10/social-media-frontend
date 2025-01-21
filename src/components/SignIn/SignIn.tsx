@@ -39,7 +39,7 @@ export default function SignIn() {
       window.localStorage.setItem("token", data.data.token);
       setUser(data.data);
       enqueueSnackbar("Signed in successfully", { variant: "success" });
-      navigate({ to: "/my-profile" });
+      navigate({ to: "/feed" });
     } catch (error) {
       if (error instanceof AxiosError) {
         switch (error.status) {
