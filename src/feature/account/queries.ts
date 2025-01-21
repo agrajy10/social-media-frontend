@@ -30,6 +30,11 @@ const updatePassword = async (
   return response.data.data;
 };
 
+const fetchAccountDetails = async (username: string): Promise<User> => {
+  const response = await axiosInstance.get(`/users/${username}/profile`);
+  return response.data.data;
+};
+
 export const useFetchMyProfile = () =>
   useQuery({
     queryKey: ["user", "accountDetails"],
@@ -51,4 +56,10 @@ export const useUpdateProfileImage = () =>
 export const useUpdatePassword = () =>
   useMutation({
     mutationFn: updatePassword,
+  });
+
+export const useFetchAccountDetails = (username: string) =>
+  useQuery({
+    queryKey: [username, "accountDetails"],
+    queryFn: () => fetchAccountDetails(username),
   });

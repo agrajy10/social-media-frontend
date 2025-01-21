@@ -1,6 +1,7 @@
 import {
   Avatar,
   Box,
+  CircularProgress,
   Container,
   Paper,
   Skeleton,
@@ -8,28 +9,36 @@ import {
   Tab,
   Tabs,
   Typography,
-} from '@mui/material'
-import { createFileRoute } from '@tanstack/react-router'
-import useAuth from '../../../hooks/useAuth'
-import { SyntheticEvent, useState } from 'react'
-import ChangePassword from '../../../components/ManageProfile/ChangePassword'
-import UploadProfileImage from '../../../components/ManageProfile/UploadProfileImage'
-import { useFetchMyPosts } from '../../../feature/account/queries'
-import Posts from '../../../components/Posts'
+} from "@mui/material";
+import {
+  createFileRoute,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "@tanstack/react-router";
+import useAuth from "../../../hooks/useAuth";
+import { SyntheticEvent, useState } from "react";
+import ChangePassword from "../../../components/ManageProfile/ChangePassword";
+import UploadProfileImage from "../../../components/ManageProfile/UploadProfileImage";
+import {
+  useFetchAccountDetails,
+  useFetchMyPosts,
+} from "../../../feature/account/queries";
+import Posts from "../../../components/Posts";
 
-export const Route = createFileRoute('/__auth/$username/profile/')({
+export const Route = createFileRoute("/__auth/$username/profile/")({
   component: MyProfile,
-})
+});
 
 interface TabPanelProps {
-  children?: React.ReactNode
-  dir?: string
-  index: number
-  value: number
+  children?: React.ReactNode;
+  dir?: string;
+  index: number;
+  value: number;
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props
+  const { children, value, index, ...other } = props;
 
   return (
     <div
@@ -45,119 +54,153 @@ function TabPanel(props: TabPanelProps) {
         </Box>
       )}
     </div>
-  )
+  );
 }
 
 function a11yProps(index: number) {
   return {
     id: `full-width-tab-${index}`,
-    'aria-controls': `full-width-tabpanel-${index}`,
-  }
+    "aria-controls": `full-width-tabpanel-${index}`,
+  };
 }
 
 function MyProfile() {
-  const { user } = useAuth()
-  const { data: posts, isLoading: arePostsLoading, refetch } = useFetchMyPosts()
-  const [activeTab, setActiveTab] = useState(0)
+  const { user } = useAuth();
+  const { username } = Route.useParams();
+  const { data: profile, isLoading: isProfileLoading } =
+    useFetchAccountDetails(username);
+  // const {
+  //   data: posts,
+  //   isLoading: arePostsLoading,
+  //   refetch,
+  // } = useFetchMyPosts();
+  const [activeTab, setActiveTab] = useState(0);
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue)
+    setActiveTab(newValue);
+  };
+
+  if (isProfileLoading) {
+    return (
+      <Box
+        sx={{
+          position: "fixed",
+          width: "100%",
+          height: "calc(100vh - 56px)",
+          bottom: 0,
+          left: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
-  return (
-    <>
-      <Container maxWidth="md" sx={{ my: 5 }}>
-        {user && (
-          <>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 4,
-              }}
-            >
-              {user.profileImage && (
-                <Avatar
-                  sx={{ width: 150, height: 150, fontSize: 50 }}
-                  alt={user.name}
-                  src={user.profileImage}
-                />
-              )}
-              {!user.profileImage && (
-                <Avatar
-                  sx={{ width: 150, height: 150, fontSize: 50 }}
-                  alt={user.name}
-                >
-                  {user.name.charAt(0).toUpperCase()}
-                </Avatar>
-              )}
-              <Box>
-                <Typography component="h1" variant="h2">
-                  {user.name}
-                </Typography>
-                <Typography
-                  sx={{ mt: 0.5, opacity: 0.6 }}
-                  component="h1"
-                  variant="h4"
-                >
-                  {user.username}
-                </Typography>
-              </Box>
-            </Box>
-            <Paper sx={{ mt: 10, overflow: 'hidden' }}>
-              <Tabs
-                variant="fullWidth"
-                value={activeTab}
-                onChange={handleTabChange}
-                centered
+  if (user && profile) {
+    const isOwnProfile = user.id === profile.id;
+
+    return (
+      <>
+        <Container maxWidth="md" sx={{ my: 5 }}>
+          {profile && (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 4,
+                }}
               >
-                <Tab
-                  sx={{ p: 2, m: 0, borderRadius: 0 }}
-                  {...a11yProps(0)}
-                  label="Posts"
-                />
-                <Tab
-                  sx={{ p: 2, m: 0, borderRadius: 0 }}
-                  {...a11yProps(1)}
-                  label="Upload profile picture"
-                />
-                <Tab
-                  sx={{ p: 2, m: 0, borderRadius: 0 }}
-                  {...a11yProps(2)}
-                  label="Change password"
-                />
-              </Tabs>
-              <TabPanel value={activeTab} index={0}>
-                {arePostsLoading && (
-                  <Stack spacing={2}>
-                    {Array.from({ length: 8 }).map((_, index) => (
-                      <Skeleton
-                        sx={{ transform: 'none' }}
-                        height={200}
-                        key={index}
-                      />
-                    ))}
-                  </Stack>
-                )}
-                {posts && (
-                  <Posts
-                    queryKey={['user', 'myPosts']}
-                    posts={posts}
-                    refetch={refetch}
+                {profile.profileImage && (
+                  <Avatar
+                    sx={{ width: 150, height: 150, fontSize: 50 }}
+                    alt={profile.name}
+                    src={profile.profileImage}
                   />
                 )}
-              </TabPanel>
-              <TabPanel value={activeTab} index={1}>
-                <UploadProfileImage />
-              </TabPanel>
-              <TabPanel value={activeTab} index={2}>
-                <ChangePassword />
-              </TabPanel>
-            </Paper>
-          </>
-        )}
-      </Container>
-    </>
-  )
+                {!profile.profileImage && (
+                  <Avatar
+                    sx={{ width: 150, height: 150, fontSize: 50 }}
+                    alt={profile.name}
+                  >
+                    {profile.name.charAt(0).toUpperCase()}
+                  </Avatar>
+                )}
+                <Box>
+                  <Typography component="h1" variant="h2">
+                    {profile.name}
+                  </Typography>
+                  <Typography
+                    sx={{ mt: 0.5, opacity: 0.6 }}
+                    component="h1"
+                    variant="h4"
+                  >
+                    {profile.username}
+                  </Typography>
+                </Box>
+              </Box>
+              {isOwnProfile && (
+                <Paper sx={{ mt: 10, overflow: "hidden" }}>
+                  <Tabs
+                    variant="fullWidth"
+                    value={activeTab}
+                    onChange={handleTabChange}
+                    centered
+                  >
+                    <Tab
+                      sx={{ p: 2, m: 0, borderRadius: 0 }}
+                      {...a11yProps(0)}
+                      label="Posts"
+                    />
+                    <Tab
+                      sx={{ p: 2, m: 0, borderRadius: 0 }}
+                      {...a11yProps(1)}
+                      label="Upload profile picture"
+                    />
+                    <Tab
+                      sx={{ p: 2, m: 0, borderRadius: 0 }}
+                      {...a11yProps(2)}
+                      label="Change password"
+                    />
+                  </Tabs>
+                  <TabPanel value={activeTab} index={0}>
+                    {/* {arePostsLoading && (
+                      <Stack spacing={2}>
+                        {Array.from({ length: 8 }).map((_, index) => (
+                          <Skeleton
+                            sx={{ transform: "none" }}
+                            height={200}
+                            key={index}
+                          />
+                        ))}
+                      </Stack>
+                    )}
+                    {posts && (
+                      <Posts
+                        queryKey={["user", "myPosts"]}
+                        posts={posts}
+                        refetch={refetch}
+                      />
+                    )} */}
+                  </TabPanel>
+                  <TabPanel value={activeTab} index={1}>
+                    <UploadProfileImage />
+                  </TabPanel>
+                  <TabPanel value={activeTab} index={2}>
+                    <ChangePassword />
+                  </TabPanel>
+                </Paper>
+              )}
+            </>
+          )}
+        </Container>
+      </>
+    );
+  }
+
+  return null;
 }
