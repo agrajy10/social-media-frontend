@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { User } from "../types/User";
-import { useFetchAccountDetails } from "../feature/account/queries";
+import { useFetchMyProfile } from "../feature/account/queries";
 import { Box, CircularProgress } from "@mui/material";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -14,17 +14,17 @@ export interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { refetch } = useFetchAccountDetails();
+  const { refetch } = useFetchMyProfile();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    fetchAccountDetails();
+    fetchMyProfile();
   }, []);
 
-  const fetchAccountDetails = async () => {
+  const fetchMyProfile = async () => {
     const { data } = await refetch();
     if (data) {
       setUser(data);

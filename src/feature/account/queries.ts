@@ -5,7 +5,7 @@ import convertToBase64 from "../../utils/convertToBase64";
 import { ChangePasswordFormValues } from "../../components/ManageProfile/ChangePassword";
 import { Post } from "../../types/Post";
 
-const fetchAccountDetails = async (): Promise<User> => {
+const fetchMyProfile = async (): Promise<User> => {
   const response = await axiosInstance.get("/users/profile");
   return response.data.data;
 };
@@ -30,10 +30,10 @@ const updatePassword = async (
   return response.data.data;
 };
 
-export const useFetchAccountDetails = () =>
+export const useFetchMyProfile = () =>
   useQuery({
     queryKey: ["user", "accountDetails"],
-    queryFn: fetchAccountDetails,
+    queryFn: fetchMyProfile,
     enabled: false,
   });
 
