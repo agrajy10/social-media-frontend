@@ -11,3 +11,8 @@ export type User = {
   following: number;
   totalPosts: number;
 };
+
+export enum UserFollowActions {
+  FOLLOW = "FOLLOW",
+  UNFOLLOW = "UNFOLLOW",
+}

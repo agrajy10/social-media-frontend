@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosInstance from "../../axios";
-import { User } from "../../types/User";
+import { User, UserFollowActions } from "../../types/User";
 import convertToBase64 from "../../utils/convertToBase64";
 import { ChangePasswordFormValues } from "../../components/ManageProfile/ChangePassword";
 import { Post } from "../../types/Post";
@@ -35,6 +35,27 @@ const fetchAccountDetails = async (username: string): Promise<User> => {
   return response.data.data;
 };
 
+const followUnfollow = async ({
+  action,
+  userId,
+}: {
+  action: UserFollowActions;
+  userId: number;
+}) => {
+  let response;
+
+  switch (action) {
+    case UserFollowActions.FOLLOW:
+      response = await axiosInstance.post(`/users/${userId}/follow`);
+      break;
+    case UserFollowActions.UNFOLLOW:
+      response = await axiosInstance.delete(`/users/${userId}/follow`);
+      break;
+  }
+
+  return response?.data.data;
+};
+
 export const useFetchMyProfile = () =>
   useQuery({
     queryKey: ["user", "accountDetails"],
@@ -62,4 +83,9 @@ export const useFetchAccountDetails = (username: string) =>
   useQuery({
     queryKey: [username, "accountDetails"],
     queryFn: () => fetchAccountDetails(username),
+  });
+
+export const useFollowUnFollowUser = () =>
+  useMutation({
+    mutationFn: followUnfollow,
   });

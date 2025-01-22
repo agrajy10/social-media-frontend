@@ -5,30 +5,25 @@ import {
   CircularProgress,
   Container,
   Paper,
-  Skeleton,
-  Stack,
   Tab,
   Tabs,
   Typography,
 } from "@mui/material";
-import {
-  createFileRoute,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import useAuth from "../../../hooks/useAuth";
 import { SyntheticEvent, useState } from "react";
 import ChangePassword from "../../../components/ManageProfile/ChangePassword";
 import UploadProfileImage from "../../../components/ManageProfile/UploadProfileImage";
 import {
   useFetchAccountDetails,
-  useFetchMyPosts,
+  useFollowUnFollowUser,
 } from "../../../feature/account/queries";
-import Posts from "../../../components/Posts";
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import UnfollowUserDialog from "../../../components/UnfollowUserDialog";
+import { useSnackbar } from "notistack";
+import { UserFollowActions } from "../../../types/User";
+
 export const Route = createFileRoute("/__auth/$username/profile/")({
   component: MyProfile,
 });
@@ -70,8 +65,13 @@ function a11yProps(index: number) {
 function MyProfile() {
   const { user } = useAuth();
   const { username } = Route.useParams();
-  const { data: profile, isLoading: isProfileLoading } =
-    useFetchAccountDetails(username);
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    refetch,
+  } = useFetchAccountDetails(username);
+  const { mutate: followUnfollow } = useFollowUnFollowUser();
+
   // const {
   //   data: posts,
   //   isLoading: arePostsLoading,
@@ -79,6 +79,7 @@ function MyProfile() {
   // } = useFetchMyPosts();
   const [activeTab, setActiveTab] = useState(0);
   const [dialogOpen, setDialogOpen] = useState<null | string>(null);
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
@@ -87,6 +88,22 @@ function MyProfile() {
   const openDialog = (type: string) => setDialogOpen(type);
 
   const closeDialog = () => setDialogOpen(null);
+
+  const handleFollowUnfollow = (action: UserFollowActions, userId: number) => {
+    followUnfollow(
+      { action, userId },
+      {
+        onSuccess: () => {
+          refetch();
+        },
+        onError: () => {
+          enqueueSnackbar("An error occured. Please try again later.", {
+            variant: "error",
+          });
+        },
+      }
+    );
+  };
 
   if (isProfileLoading) {
     return (
@@ -153,6 +170,12 @@ function MyProfile() {
                     <>
                       {!profile.isFollowing && (
                         <Button
+                          onClick={() =>
+                            handleFollowUnfollow(
+                              UserFollowActions.FOLLOW,
+                              profile.id
+                            )
+                          }
                           startIcon={<AddIcon />}
                           sx={{ mt: 2 }}
                           variant="contained"
@@ -265,7 +288,10 @@ function MyProfile() {
           isSubmitting={false}
           open={dialogOpen === "unfollow"}
           handleClose={closeDialog}
-          handleUserUnfollow={() => {}}
+          handleUserUnfollow={() => {
+            handleFollowUnfollow(UserFollowActions.UNFOLLOW, profile.id);
+            closeDialog();
+          }}
         />
       </>
     );
